@@ -5,6 +5,8 @@ Tämä dokumentti määrittelee Helsingin Yliopiston Tietojenkäsittelytieteen k
 
 Projektin aiheena on shakille toteutettava tekoäly. Toteutan Pythonilla shakkipelin sovelluslogiikan sekä tekoälyn, joka käyttää negamax + alpha‑beta ‑hakua ja transpositiotaulua.
 
+Negamax + alpha‑beta ‑haku muodostaa tekoälyn käyttämän pelipuuhakualgoritmin, ja transpositiotaulua käytetään vähentämään päällekkäistä hakua tallentamalla aiemmin tutkittujen peliasemien arvioita.
+
 ## Ohjelmointikielet
 Toteutan projektin Pythonilla.
 
@@ -33,3 +35,4 @@ Projektissa käytän seuraavia lähteitä:
 [Alpha–beta pruning](https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning)
 
 [Transposition table](https://en.wikipedia.org/wiki/Transposition_table)
+
