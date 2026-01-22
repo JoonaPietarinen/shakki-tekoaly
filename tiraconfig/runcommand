@@ -1,1 +1,1 @@
-poetry run python3 src/stupid_ai.py
+poetry run python3 src/smart_ai.py
