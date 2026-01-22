@@ -1,3 +1,5 @@
+import copy
+
 FILES = "abcdefgh"
 RANKS = "12345678"
 START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
@@ -150,3 +152,15 @@ class Board:
 
         # Toggle turn
         self.turn = 'b' if self.turn == 'w' else 'w'
+
+    def copy(self):
+        # Create a deep copy of the board for ai calculations
+        new_board = Board()
+        new_board.grid = copy.deepcopy(self.grid)
+        new_board.turn = self.turn
+        new_board.castling = self.castling
+        new_board.en_passant = self.en_passant
+        new_board.halfmove = self.halfmove
+        new_board.fullmove = self.fullmove
+        return new_board
+

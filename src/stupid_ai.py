@@ -1,7 +1,7 @@
 import random
 import time
 from board import Board
-from moves import generate_legal_moves
+from moves import generate_legal_moves, is_checkmate, is_stalemate, is_draw_by_fifty_moves
 
 
 def set_board(board: Board, board_position: str):
@@ -14,7 +14,16 @@ def make_move(board: Board):
     # Make a random legal move
     legal_moves = generate_legal_moves(board)
     if not legal_moves:
+        # Game is over - determine reason
+        if is_checkmate(board):
+            print("Checkmate! I have no legal moves.")
+        elif is_stalemate(board):
+            print("Stalemate! I have no legal moves but I'm not in check.")
         raise RuntimeError("No legal moves available")
+    
+    if is_draw_by_fifty_moves(board):
+        print("Draw by fifty-move rule!")
+    
     print(f"I found {len(legal_moves)} legal moves: {', '.join(legal_moves)}")
     choice = random.choice(legal_moves)
     board.make_move(choice)
@@ -32,9 +41,13 @@ def main():
             board = Board()
             print("Board reset!")
         elif opponent_move.startswith("PLAY:"):
-            choice = make_move(board)
-            print(f"I chose {choice}!")
-            print(f"MOVE:{choice}")
+            try:
+                choice = make_move(board)
+                print(f"I chose {choice}!")
+                print(f"MOVE:{choice}")
+            except RuntimeError as e:
+                print(f"Game over: {e}")
+                break
         elif opponent_move.startswith("MOVE:"):
             move = opponent_move.removeprefix("MOVE:")
             board.make_move(move)
