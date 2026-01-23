@@ -5,25 +5,25 @@ RANKS = "12345678"
 START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
 def coord_to_sq(coord: str):
-    # Convert algebraic notation like "e4" to (row, col) indices (row 0 = rank 8)
+    """Convert algebraic notation like 'e4' to (row, col) indices."""
     col = FILES.index(coord[0])
     row = 8 - int(coord[1])
     return row, col
 
 def sq_to_coord(row: int, col: int):
-    # Convert (row, col) indices back to algebraic notation like "e4"
+    """Convert (row, col) indices back to algebraic notation like 'e4'."""
     return f"{FILES[col]}{8 - row}"
 
 class Board:
     def __init__(self, fen: str = None):
-        # Initialize board from FEN or default start position
+        """Initialize board from FEN string or default start position."""
         if fen and fen != "startpos_fen":
             self.set_fen(fen)
         else:  
             self.set_fen(START_FEN)
 
     def set_fen(self, fen: str):
-        # Parse FEN string into internal state
+        """Parse FEN string into internal board state."""
         if fen == "startpos_fen":
             fen = START_FEN
         parts = fen.split()
@@ -33,18 +33,18 @@ class Board:
             row = []
             for ch in r:
                 if ch.isdigit():
-                    row += ['.'] * int(ch)                                      # Empty squares
+                    row += ['.'] * int(ch)
                 else:
-                    row.append(ch)                                              # Pieces symbols
+                    row.append(ch)
             self.grid.append(row)   
-        self.turn = parts[1]                                                    # Active color
-        self.castling = parts[2]                                                # Castling rights
-        self.en_passant = parts[3] if parts[3] != '-' else None                 # En passant target square
-        self.halfmove = int(parts[4])                                           # Halfmove clock
-        self.fullmove = int(parts[5])                                           # Fullmove number
+        self.turn = parts[1]
+        self.castling = parts[2]
+        self.en_passant = parts[3] if parts[3] != '-' else None
+        self.halfmove = int(parts[4])
+        self.fullmove = int(parts[5])
 
     def to_fen(self) -> str:
-        # Convert internal state back to FEN string
+        """Convert internal board state back to FEN string."""
         rows = []
         for r in self.grid:
             comp = []
@@ -65,7 +65,10 @@ class Board:
         return f"{'/'.join(rows)} {self.turn} {castling} {ep} {self.halfmove} {self.fullmove}"
 
     def make_move(self, move_uci: str):
-        # Apply a move in UCI format to the internal board state
+        """
+        Apply a move in UCI format to the board.
+        Handles castling, en passant, promotion, and updates board state.
+        """
         from_sq = move_uci[:2]
         to_sq = move_uci[2:4]
         promo = move_uci[4:].lower() if len(move_uci) == 5 else None
@@ -83,26 +86,25 @@ class Board:
             self.grid[tr - direction][tc] = '.'
             capture = True
 
-        # Move the piece
         self.grid[fr][fc] = '.'
         if promo:
             self.grid[tr][tc] = promo.upper() if piece.isupper() else promo.lower()
         else:
             self.grid[tr][tc] = piece
 
-        # Castling rook move
+        # Castling: move the rook
         if piece.lower() == 'k' and abs(tc - fc) == 2:
-            if tc > fc:  # kingside
+            if tc > fc:
                 rook_from = (fr, 7)
                 rook_to = (fr, 5)
-            else:        # queenside
+            else:
                 rook_from = (fr, 0)
                 rook_to = (fr, 3)
             rook_piece = self.grid[rook_from[0]][rook_from[1]]
             self.grid[rook_from[0]][rook_from[1]] = '.'
             self.grid[rook_to[0]][rook_to[1]] = rook_piece
 
-        # Update castling rights when king or rook moves/captured
+        # Update castling rights
         def remove_castling(right: str):
             if right in self.castling:
                 self.castling = self.castling.replace(right, '')
@@ -133,28 +135,26 @@ class Board:
         if not self.castling:
             self.castling = '-'
 
-        # En passant target square after a double pawn push
+        # Set en passant target after double pawn push
         if piece.lower() == 'p' and abs(tr - fr) == 2:
             mid_row = (tr + fr) // 2
             self.en_passant = sq_to_coord(mid_row, fc)
         else:
             self.en_passant = None
 
-        # Halfmove clock reset on pawn move or capture
+        # Update halfmove clock (50-move rule)
         if piece.lower() == 'p' or capture:
             self.halfmove = 0
         else:
             self.halfmove += 1
 
-        # Fullmove count increases after black moves
         if self.turn == 'b':
             self.fullmove += 1
 
-        # Toggle turn
         self.turn = 'b' if self.turn == 'w' else 'w'
 
     def copy(self):
-        # Create a deep copy of the board for ai calculations
+        """Create a deep copy of the board for search calculations."""
         new_board = Board()
         new_board.grid = copy.deepcopy(self.grid)
         new_board.turn = self.turn

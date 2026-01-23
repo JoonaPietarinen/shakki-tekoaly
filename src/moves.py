@@ -1,8 +1,14 @@
 from board import coord_to_sq, sq_to_coord
 
 def generate_legal_moves(board):
-    # Generate a list of legal moves in UCI format for the side to move
-    color = board.turn  # 'w' or 'b'
+    """
+    Generate all legal moves for the current side to move.
+    Filters pseudo-legal moves to exclude those leaving king in check.
+    
+    Returns:
+        List of moves in UCI format (e.g., 'e2e4', 'e7e8q')
+    """
+    color = board.turn
     grid = board.grid
     pseudo = []
 
@@ -31,8 +37,9 @@ def generate_legal_moves(board):
         return 0 <= r < 8 and 0 <= c < 8
 
     def is_attacked(r: int, c: int, by_color: str, grid_state=None) -> bool:
-        # Check if square (r, c) is attacked by side 'by_color'
+        """Check if square (r, c) is attacked by side 'by_color'."""
         gs = grid_state if grid_state is not None else grid
+        
         # Pawn attacks
         pawn_dir = -1 if by_color == 'w' else 1
         for dc in (-1, 1):
@@ -42,6 +49,7 @@ def generate_legal_moves(board):
                 p = gs[rr][cc]
                 if p != '.' and ((p == 'P' and by_color == 'w') or (p == 'p' and by_color == 'b')):
                     return True
+        
         # Knight attacks
         for dr, dc in [(2, 1), (2, -1), (-2, 1), (-2, -1), (1, 2), (1, -2), (-1, 2), (-1, -2)]:
             rr, cc = r + dr, c + dc
@@ -52,6 +60,7 @@ def generate_legal_moves(board):
                         return True
                     if by_color == 'b' and p == 'n':
                         return True
+        
         # King attacks
         for dr in (-1, 0, 1):
             for dc in (-1, 0, 1):
@@ -65,7 +74,8 @@ def generate_legal_moves(board):
                             return True
                         if by_color == 'b' and p == 'k':
                             return True
-        # Sliding attacks
+        
+        # Sliding pieces (rooks, bishops, queens)
         def slide(directions, attackers):
             for dr, dc in directions:
                 rr, cc = r + dr, c + dc
@@ -80,6 +90,7 @@ def generate_legal_moves(board):
                     rr += dr
                     cc += dc
             return False
+        
         if slide([(1, 0), (-1, 0), (0, 1), (0, -1)], {'r', 'q'}):
             return True
         if slide([(1, 1), (1, -1), (-1, 1), (-1, -1)], {'b', 'q'}):
@@ -87,7 +98,6 @@ def generate_legal_moves(board):
         return False
 
     def gen_pawn(r: int, c: int, piece: str):
-        # Generate pawn moves
         direction = -1 if is_white(piece) else 1
         start_row = 6 if is_white(piece) else 1
         promo_row = 0 if is_white(piece) else 7
@@ -112,7 +122,6 @@ def generate_legal_moves(board):
                     add_pseudo(r, c, one_r, cc)
 
     def gen_knight(r: int, c: int, piece: str):
-        # Generate knight moves
         deltas = [(2, 1), (2, -1), (-2, 1), (-2, -1), (1, 2), (1, -2), (-1, 2), (-1, -2)]
         for dr, dc in deltas:
             nr, nc = r + dr, c + dc
@@ -121,7 +130,6 @@ def generate_legal_moves(board):
             add_pseudo(r, c, nr, nc)
 
     def gen_slider(r: int, c: int, piece: str, directions):
-        # Generate moves for bishops, rooks, queens
         for dr, dc in directions:
             nr, nc = r + dr, c + dc
             while in_bounds(nr, nc):
@@ -134,7 +142,6 @@ def generate_legal_moves(board):
                 nc += dc
 
     def gen_king(r: int, c: int, piece: str):
-        # Generate king moves
         for dr in (-1, 0, 1):
             for dc in (-1, 0, 1):
                 if dr == 0 and dc == 0:
@@ -144,7 +151,7 @@ def generate_legal_moves(board):
                     continue
                 add_pseudo(r, c, nr, nc)
 
-        # Castling with safety checks
+        # Castling: check path is clear and king doesn't move through check
         def squares_safe(squares):
             opp = 'b' if color == 'w' else 'w'
             return all(not is_attacked(sr, sc, opp) for sr, sc in squares)
@@ -160,7 +167,7 @@ def generate_legal_moves(board):
             if 'q' in board.castling and grid[0][3] == '.' and grid[0][2] == '.' and grid[0][1] == '.' and squares_safe([(0, 4), (0, 3), (0, 2)]):
                 add_pseudo(r, c, 0, 2)
 
-    # Find pseudo-legal moves
+    # Generate pseudo-legal moves for all pieces
     for r in range(8):
         for c in range(8):
             piece = grid[r][c]
@@ -184,7 +191,7 @@ def generate_legal_moves(board):
             elif p == 'k':
                 gen_king(r, c, piece)
 
-    # Filter out moves that leave king in check
+    # Filter out moves that leave own king in check
     legal = []
     for m in pseudo:
         temp = board.copy()
@@ -208,10 +215,9 @@ def generate_legal_moves(board):
 
 
 def is_checkmate(board):
-    # Check if current side to move is checkmated
+    """Check if the current side to move is checkmated."""
     moves = generate_legal_moves(board)
     if not moves:
-        # No legal moves - check if king is in check
         color = board.turn
         king_pos = None
         for r in range(8):
@@ -223,16 +229,12 @@ def is_checkmate(board):
             if king_pos:
                 break
         if king_pos:
-            opponent_color = 'b' if color == 'w' else 'w'
-            # Reuse is_attacked logic from generate_legal_moves
-            temp_board = board.copy()
-            temp_moves = generate_legal_moves(temp_board)  # This checks attacks internally
-            return True  # If no moves and we have a king, it's checkmate
+            return True
     return False
 
 
 def is_stalemate(board):
-    # Check if current side to move is stalemated (no legal moves but not in check)
+    """Check if the current side to move is stalemated."""
     moves = generate_legal_moves(board)
     if not moves:
         return not is_checkmate(board)
@@ -240,6 +242,6 @@ def is_stalemate(board):
 
 
 def is_draw_by_fifty_moves(board):
-    # Check if draw by 50-move rule
-    return board.halfmove >= 100  # 50 full moves = 100 half-moves
+    """Check if draw by 50-move rule (100 half-moves)."""
+    return board.halfmove >= 100
 

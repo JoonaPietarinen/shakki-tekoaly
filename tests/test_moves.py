@@ -1,3 +1,10 @@
+"""
+Local testing
+"""
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+
 from board import Board
 from moves import generate_legal_moves
 

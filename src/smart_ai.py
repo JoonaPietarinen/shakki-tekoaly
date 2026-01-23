@@ -1,51 +1,66 @@
-"""
-Stupid AI for chess.
-Chooses random legal moves without any strategy.
-Used mainly for testing and as placeholder AI.
-"""
-
-import random
 import time
 from board import Board
 from moves import generate_legal_moves, is_checkmate, is_stalemate, is_draw_by_fifty_moves
+from search import find_best_move, clear_transposition_table
 
 
 def set_board(board: Board, board_position: str):
+    """Set the board to a given FEN position."""
     print(f"Set board to {board_position}!")
     board.set_fen(board_position)
 
 
-def make_move(board: Board):
+def make_move(board: Board, search_depth=4):
+    """
+    Select and play the best move using negamax search.
+    
+    Args:
+        board: Current board state
+        search_depth: Search depth (default 4)
+    
+    Returns:
+        Chosen move in UCI format
+    """
     legal_moves = generate_legal_moves(board)
+    
     if not legal_moves:
         if is_checkmate(board):
-            print("Checkmate! I have no legal moves.")
+            print("Checkmate!")
         elif is_stalemate(board):
-            print("Stalemate! I have no legal moves but I'm not in check.")
+            print("Stalemate!")
         raise RuntimeError("No legal moves available")
     
     if is_draw_by_fifty_moves(board):
         print("Draw by fifty-move rule!")
     
-    print(f"I found {len(legal_moves)} legal moves: {', '.join(legal_moves)}")
-    choice = random.choice(legal_moves)
+    print(f"Searching with depth {search_depth}...")
+    choice = find_best_move(board, depth=search_depth, use_iterative_deepening=False)
+    
+    if not choice:
+        print("Search failed, using first legal move")
+        choice = legal_moves[0]
+    
     board.make_move(choice)
     return choice
 
 
 def main():
+    """Main loop: receive commands and play moves."""
     board = Board()
+    search_depth = 4
+    
     while True:
         opponent_move = input()
-        time.sleep(random.randrange(1, 10) / 100)
+        
         if opponent_move.startswith("BOARD:"):
             set_board(board, opponent_move.removeprefix("BOARD:"))
         elif opponent_move.startswith("RESET:"):
             board = Board()
+            clear_transposition_table()
             print("Board reset!")
         elif opponent_move.startswith("PLAY:"):
             try:
-                choice = make_move(board)
+                choice = make_move(board, search_depth=search_depth)
                 print(f"I chose {choice}!")
                 print(f"MOVE:{choice}")
             except RuntimeError as e:
