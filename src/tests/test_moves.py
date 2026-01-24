@@ -36,13 +36,3 @@ def test_en_passant():
     b = Board("rnbqkbnr/ppp1pppp/8/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 1")
     moves = generate_legal_moves(b)
     assert 'e5d6' in moves, "Missing en passant capture"
-
-
-if __name__ == "__main__":
-    test_start_position()
-    test_promotion()
-    test_castling()
-    test_en_passant()
-    print(" All tests passed!")
-
-# TODO : Tests for AI
