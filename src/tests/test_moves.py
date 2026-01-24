@@ -43,4 +43,6 @@ if __name__ == "__main__":
     test_promotion()
     test_castling()
     test_en_passant()
-    print("✅ All tests passed!")
+    print(" All tests passed!")
+
+# TODO : Tests for AI

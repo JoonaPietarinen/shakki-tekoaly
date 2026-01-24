@@ -2,9 +2,10 @@
 name = "stupid-chess-ai"
 version = "0.1.0"
 description = "Chess AI using negamax search with alpha-beta pruning"
-authors = ["Your Name <your.email@example.com>"]
+authors = ["Joona Pietarinen <joona@example.com>"]
 license = "MIT"
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.10"
