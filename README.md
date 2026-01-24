@@ -7,3 +7,4 @@
 ## Viikkoraportit
 
 [Viikko 1](https://github.com/JoonaPietarinen/shakki-tekoaly/blob/f61ed46a34e3bf38548daa17a4fccaee5a97b5e6/docs/viikkoraportti1.md)
+[Viikko 2](https://github.com/JoonaPietarinen/shakki-tekoaly/blob/780387bb54e4174cff220451173cc7fcaaf2a6a3/docs/viikkoraportti2.md)
