@@ -36,3 +36,15 @@ def test_en_passant():
     b = Board("rnbqkbnr/ppp1pppp/8/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 1")
     moves = generate_legal_moves(b)
     assert 'e5d6' in moves, "Missing en passant capture"
+
+def test_checkmate():
+    """Test checkmate detection."""
+    b = Board("rk6/8/8/8/8/8/8/Kqr5 w KQkq - 0 1")
+    moves = generate_legal_moves(b)
+    assert len(moves) == 0, "Should be checkmate"
+
+def test_stalemate():
+    """Test stalemate detection."""
+    b = Board("7k/5Q2/6K1/8/8/8/8/8 b - - 0 1")
+    moves = generate_legal_moves(b)
+    assert len(moves) == 0, "Should be stalemate"
