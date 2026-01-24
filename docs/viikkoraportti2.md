@@ -6,6 +6,8 @@ Tämän jälkeen aloin toteuttamaan shakkia. Pyrin parhaani mukaan toteuttamaan 
 
 Lisäksi toteutin negamax-algoritmin alpha-beta-karsinnalla ja testit pelilogiikalle.
 
+Pelasin pelin tekoälyä vastaan ja käytännössä hävisin. Jos olisin lisännyt PST taulun kuninkaan loppupelistä, olisin todennäköisesti hävinnyt oikeasti. Koska en lisännyt kyseistä taulua, tekoäly jäi jumiin silmukkaan, jossa se liikutti kuningastaan a8 ja b8 välillä samalla, kun minulla oli jäljellä enää oma kuninkaani.
+
 **Miten ohjelma on edistynyt?**
 
 Pelilogiikka on hyvällä mallilla, ja täysin pelattavissa. Tekoäly on alkeellinen, mutta toimii.
