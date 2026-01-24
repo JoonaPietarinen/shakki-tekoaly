@@ -21,3 +21,6 @@ Negamax + alpha-beta -haun toteutus pythonilla.
 **Mitä teen seuraavaksi?**
 
 Seuraavaksi toteutan toistuvaan asemaan perustuva tasapelin. Tämän jälkeen siirryn transpositiotaulun toteutukseen ja siirtojen järjestämiseen alpha-beta-karsinnalle.
+
+
+Aikaa tällä viikolla käytin n. 20h
