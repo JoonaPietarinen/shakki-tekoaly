@@ -1,16 +1,24 @@
 [tool.poetry]
 name = "stupid-chess-ai"
 version = "0.1.0"
-description = ""
-authors = []
-license = "MIT License"
+description = "Chess AI using negamax search with alpha-beta pruning"
+authors = ["Joona Pietarinen <joona@example.com>"]
+license = "MIT"
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.10"
-chess = "^1.10.0"
 
+[tool.poetry.group.dev.dependencies]
+pytest = "^9.0.0"
+coverage = "^7.13.1"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["src/tests"]
+addopts = "-v"
