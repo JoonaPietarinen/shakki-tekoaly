@@ -1,8 +1,59 @@
 import copy
+import random
 
 FILES = "abcdefgh"
 RANKS = "12345678"
 START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+
+random.seed(42)
+ZOBRIST_TABLE = {}
+
+# Generate Zobrist keys for all pieces and squares
+for piece in 'pnbrqkPNBRQK':
+    ZOBRIST_TABLE[piece] = [random.getrandbits(64) for _ in range(64)]
+
+ZOBRIST_WHITE = random.getrandbits(64)
+ZOBRIST_BLACK = random.getrandbits(64)
+
+ZOBRIST_CASTLING = {
+    'K': random.getrandbits(64),
+    'Q': random.getrandbits(64),
+    'k': random.getrandbits(64),
+    'q': random.getrandbits(64)
+}
+
+ZOBRIST_EP = [random.getrandbits(64) for _ in range(8)]
+
+
+def compute_zobrist_hash(board):
+    """
+    Compute Zobrist hash for the current board position.
+    Used for transposition table lookups.
+    """
+    h = 0
+    
+    for r in range(8):
+        for c in range(8):
+            piece = board.grid[r][c]
+            if piece != '.':
+                square_index = r * 8 + c
+                h ^= ZOBRIST_TABLE[piece][square_index]
+    
+    if board.turn == 'w':
+        h ^= ZOBRIST_WHITE
+    else:
+        h ^= ZOBRIST_BLACK
+
+    for right in board.castling:
+        if right in ZOBRIST_CASTLING:
+            h ^= ZOBRIST_CASTLING[right]
+
+    if board.en_passant:
+        ep_file = ord(board.en_passant[0]) - ord('a')
+        h ^= ZOBRIST_EP[ep_file]
+    
+    return h
+
 
 def coord_to_sq(coord: str):
     """Convert algebraic notation like 'e4' to (row, col) indices."""

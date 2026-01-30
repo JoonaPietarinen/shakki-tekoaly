@@ -1,9 +1,17 @@
+"""
+Chess AI search algorithms.
+Negamax with alpha-beta pruning and transposition table.
+"""
+
 from evaluation import evaluate_from_perspective
 from moves import generate_legal_moves
+from board import compute_zobrist_hash
 import time
 
 # Transposition table flags
 EXACT, LOWER, UPPER = 0, 1, 2
+
+# Transposition table: {hash: (depth, score, flag, best_move)}
 transposition_table = {}
 
 
@@ -15,7 +23,7 @@ def clear_transposition_table():
 
 def negamax(board, depth, alpha, beta, color=1):
     """
-    Negamax search with alpha-beta pruning.
+    Negamax search with alpha-beta pruning and transposition table.
     
     Args:
         board: Current board state
@@ -27,7 +35,21 @@ def negamax(board, depth, alpha, beta, color=1):
     Returns:
         (score, best_move) tuple
     """
-    # TODO: Implement transposition table lookup
+    board_hash = compute_zobrist_hash(board)
+    
+    # Transposition table lookup
+    if board_hash in transposition_table:
+        entry = transposition_table[board_hash]
+        entry_depth, entry_score, entry_flag = entry['depth'], entry['score'], entry['flag']
+        if entry_depth >= depth:
+            if entry_flag == EXACT:
+                return entry_score, entry.get('move')
+            elif entry_flag == LOWER:
+                alpha = max(alpha, entry_score)
+            elif entry_flag == UPPER:
+                beta = min(beta, entry_score)
+            if alpha >= beta:
+                return entry_score, entry.get('move')
     
     # Base case: depth 0 or game over
     if depth == 0:
@@ -38,10 +60,9 @@ def negamax(board, depth, alpha, beta, color=1):
         # Checkmate or stalemate
         return -100000, None
     
-    # TODO: Order moves for better pruning
-    
     best_move = None
     best_score = float('-inf')
+    flag = UPPER  # Worst case: upper bound
     
     for move in moves:
         temp = board.copy()
@@ -54,13 +75,21 @@ def negamax(board, depth, alpha, beta, color=1):
         if score > best_score:
             best_score = score
             best_move = move
+            flag = EXACT
         
         # Alpha-beta pruning
         alpha = max(alpha, score)
         if alpha >= beta:
-            break  # Beta cutoff
+            flag = LOWER  # Lower bound (beta cutoff)
+            break
     
-    # TODO: Store result in transposition table
+    # Store in transposition table
+    transposition_table[board_hash] = {
+        'depth': depth,
+        'score': best_score,
+        'flag': flag,
+        'move': best_move
+    }
     
     return best_score, best_move
 
@@ -74,11 +103,7 @@ def iterative_deepening(board, max_depth=5, time_limit=None):
     pass
 
 
-def find_best_move(board, depth=4, use_iterative_deepening=False, time_limit=None):
-    """Find the best move in the current position."""
-    if use_iterative_deepening: # Not implemented yet, so always False
-        best_move, _ = iterative_deepening(board, max_depth=depth, time_limit=time_limit)
-    else:
-        _, best_move = negamax(board, depth, float('-inf'), float('inf'))
-    
+def find_best_move(board, depth=4):
+    """Find the best move using negamax search with transposition table."""
+    _, best_move = negamax(board, depth, float('-inf'), float('inf'))
     return best_move

@@ -34,7 +34,7 @@ def make_move(board: Board, search_depth=4):
         print("Draw by fifty-move rule!")
     
     print(f"Searching with depth {search_depth}...")
-    choice = find_best_move(board, depth=search_depth, use_iterative_deepening=False)
+    choice = find_best_move(board, depth=search_depth)
     
     if not choice:
         print("Search failed, using first legal move")
