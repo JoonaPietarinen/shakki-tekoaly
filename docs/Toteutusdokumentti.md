@@ -1,7 +1,7 @@
 # Toteutusdokumentti
 Työssä ei ole käytetty laajoja kielimalleja
 ## Ohjelman rakenne
-Kyseessä on shakkitekoäly, jota vastaan voi pelata [AI-platform alustalla](https://github.com/game-ai-platform-team/tira-ai-local?tab=readme-ov-file). Tekoäly käyttää negamax-algoritmilla alpha-beta-haun ja transpositiotaulun kanssa. 
+Kyseessä on shakkitekoäly, jota vastaan voi pelata [AI-platform alustalla](https://github.com/game-ai-platform-team/tira-ai-local?tab=readme-ov-file). Tekoäly käyttää negamax-hakua alpha-beta-karsinnan ja transpositiotaulun kanssa. 
 Shakin pelilogiikka on toteutettu `board.py` sekä `moves.py` tiedostoihin. `moves.py` keskittyy laillisten siirtojen generointiin, sekä shakkimatin että patin(stalemate) tunnistamiseen. `board.py` käsittelee kaiken muun pelilogiikan. Tällä hetkellä 50 siirron sääntöä ei ole toteutettum kaikki muu pelilogiikka on.
 
 # Aika- ja Tilavaativuusanalyysi
