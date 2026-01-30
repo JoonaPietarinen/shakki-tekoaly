@@ -1,4 +1,4 @@
-# Toteutusraportti
+# Toteutusdokumentti
 Työssä ei ole käytetty laajoja kielimalleja
 ## Ohjelman rakenne
 Kyseessä on shakkitekoäly, jota vastaan voi pelata [AI-platform alustalla](https://github.com/game-ai-platform-team/tira-ai-local?tab=readme-ov-file). Tekoäly käyttää negamax-algoritmilla alpha-beta-haun ja transpositiotaulun kanssa. 
