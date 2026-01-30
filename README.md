@@ -2,7 +2,7 @@
 [![CI](https://github.com/JoonaPietarinen/shakki-tekoaly/actions/workflows/main.yml/badge.svg)](https://github.com/JoonaPietarinen/shakki-tekoaly/actions/workflows/main.yml) [![codecov](https://codecov.io/gh/JoonaPietarinen/shakki-tekoaly/graph/badge.svg?token=LqlnGuxI5O)](https://codecov.io/gh/JoonaPietarinen/shakki-tekoaly)
 ## Dokumentaatio
 
-[Määrittelydokumentti](https://github.com/JoonaPietarinen/shakki-tekoaly/blob/d88c39921e78c6f4b6044427a9184e30b7526db7/docs/m%C3%A4%C3%A4rittelydokumentti.md)
+[Määrittelydokumentti](docs/Määrittelyraportti.md)
 
 [Toteutusdokumentti](docs/Toteutusdokumentti.md)
 
@@ -13,3 +13,5 @@
 [Viikko 1](docs/viikkoraportti1.md)
 
 [Viikko 2](docs/viikkoraportti2.md)
+
+[Viikko 3](docs/viikkoraportti3.md)
