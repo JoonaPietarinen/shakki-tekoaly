@@ -60,13 +60,3 @@ def test_to_fen_promotion():
     # Should have queen instead of pawn
     assert "Q" in fen.split()[0], "Promoted pawn should be queen"
     assert "P" not in fen.split()[0], "Original pawn should not exist"
-
-
-if __name__ == "__main__":
-    test_to_fen_start_position()
-    test_fen_roundtrip()
-    test_to_fen_after_move()
-    test_to_fen_after_capture()
-    test_to_fen_castling_rights()
-    test_to_fen_promotion()
-    print("All board tests passed!")

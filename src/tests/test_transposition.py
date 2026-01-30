@@ -130,15 +130,3 @@ def test_transposition_table_depth_cutoff():
     entry_after_d3 = search.transposition_table[board_hash]
     
     assert entry_after_d3['depth'] == 3, "Should update to depth 3 result"
-
-
-if __name__ == "__main__":
-    test_zobrist_hash_consistent()
-    test_zobrist_hash_different()
-    test_transposition_table_stores_result()
-    test_transposition_table_exact_flag()
-    test_transposition_table_upper_bound()
-    test_transposition_table_lookup_with_bounds()
-    test_transposition_table_speedup()
-    test_transposition_table_depth_cutoff()
-    print(" All transposition table tests passed!")
