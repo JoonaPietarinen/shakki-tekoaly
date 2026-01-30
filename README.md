@@ -2,7 +2,7 @@
 [![CI](https://github.com/JoonaPietarinen/shakki-tekoaly/actions/workflows/main.yml/badge.svg)](https://github.com/JoonaPietarinen/shakki-tekoaly/actions/workflows/main.yml) [![codecov](https://codecov.io/gh/JoonaPietarinen/shakki-tekoaly/graph/badge.svg?token=LqlnGuxI5O)](https://codecov.io/gh/JoonaPietarinen/shakki-tekoaly)
 ## Dokumentaatio
 
-[Määrittelydokumentti](docs/Määrittelyraportti.md)
+[Määrittelydokumentti](docs/Määrittelydokumentti.md)
 
 [Toteutusdokumentti](docs/Toteutusdokumentti.md)
 
