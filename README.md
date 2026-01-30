@@ -6,6 +6,8 @@
 
 [Toteutusdokumentti](docs/Toteutusdokumentti.md)
 
+[Testausdokumentti](docs/Testausdokumentti.md)
+
 ## Viikkoraportit
 
 [Viikko 1](docs/viikkoraportti1.md)
