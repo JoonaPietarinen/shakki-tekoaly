@@ -45,14 +45,15 @@ def negamax(board, depth, alpha, beta, color=1, tt_move=None):
     search_stats['nodes_searched'] += 1
 
     board_hash = compute_zobrist_hash(board)
+    alpha_orig = alpha
     
     # Transposition table lookup
     if board_hash in transposition_table:
         entry = transposition_table[board_hash]
-        search_stats['tt_hits'] += 1
         entry_depth, entry_score, entry_flag = entry['depth'], entry['score'], entry['flag']
         tt_move = entry.get('move')
         if entry_depth >= depth:
+            search_stats['tt_hits'] += 1
             if entry_flag == EXACT:
                 return entry_score, entry.get('move')
             elif entry_flag == LOWER:
@@ -77,7 +78,6 @@ def negamax(board, depth, alpha, beta, color=1, tt_move=None):
 
     best_move = None
     best_score = float('-inf')
-    flag = UPPER  # Worst case: upper bound
     
     for move in moves:
         temp = board.copy()
@@ -90,13 +90,19 @@ def negamax(board, depth, alpha, beta, color=1, tt_move=None):
         if score > best_score:
             best_score = score
             best_move = move
-            flag = EXACT
         
         # Alpha-beta pruning
         alpha = max(alpha, score)
         if alpha >= beta:
-            flag = LOWER  # Lower bound (beta cutoff)
+            # Beta cutoff
+            flag = LOWER
             break
+    else:
+        # All moves searched without cutoff
+        if best_score > alpha_orig:
+            flag = EXACT
+        else:
+            flag = UPPER
     
     # Store in transposition table
     transposition_table[board_hash] = {
