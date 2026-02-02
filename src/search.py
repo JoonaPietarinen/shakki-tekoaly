@@ -66,7 +66,7 @@ def negamax(board, depth, alpha, beta, color=1, tt_move=None):
     # Base case: depth 0 or game over
     if depth == 0:
         return evaluate_from_perspective(board), None
-    
+
     moves = generate_legal_moves(board)
     if not moves:
         # Checkmate or stalemate
@@ -95,14 +95,14 @@ def negamax(board, depth, alpha, beta, color=1, tt_move=None):
         alpha = max(alpha, score)
         if alpha >= beta:
             # Beta cutoff
-            flag = LOWER
             break
+    if alpha >= beta:
+        flag = LOWER
+    elif best_score > alpha_orig:
+        flag = EXACT
     else:
-        # All moves searched without cutoff
-        if best_score > alpha_orig:
-            flag = EXACT
-        else:
-            flag = UPPER
+        flag = UPPER
+    
     
     # Store in transposition table
     transposition_table[board_hash] = {
@@ -112,11 +112,12 @@ def negamax(board, depth, alpha, beta, color=1, tt_move=None):
         'move': best_move
     }
     search_stats['tt_stores'] += 1
-    
+    #print(transposition_table)
+    #print(search_stats['nodes_searched'])
     return best_score, best_move
 
 
-def iterative_deepening(board, max_depth=5, time_limit=None):
+def iterative_deepening(board, max_depth, time_limit=None):
     """
     Iterative deepening search: search depth 1, 2, 3... up to max_depth.
     Stops early if time limit is exceeded.
@@ -125,7 +126,7 @@ def iterative_deepening(board, max_depth=5, time_limit=None):
     pass
 
 
-def find_best_move(board, depth=4):
+def find_best_move(board, depth):
     """Find the best move using negamax search with transposition table."""
     _, best_move = negamax(board, depth, float('-inf'), float('inf'))
     return best_move

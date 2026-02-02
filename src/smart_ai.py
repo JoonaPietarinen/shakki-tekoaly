@@ -36,10 +36,6 @@ def make_move(board: Board, search_depth=4):
     print(f"Searching with depth {search_depth}...")
     choice = find_best_move(board, depth=search_depth)
     
-    if not choice:
-        print("Search failed, using first legal move")
-        choice = legal_moves[0]
-    
     board.make_move(choice)
     return choice
 
