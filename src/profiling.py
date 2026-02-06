@@ -79,11 +79,11 @@ def detailed_profile():
     
     b = Board()
     
-    # Profile depth 4 search
+    # Profile depth 6 search
     profiler = cProfile.Profile()
     profiler.enable()
     
-    score, move = negamax(b, 4, float('-inf'), float('inf'))
+    score, move = negamax(b, 6, float('-inf'), float('inf'))
     
     profiler.disable()
     
