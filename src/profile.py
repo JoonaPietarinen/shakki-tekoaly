@@ -10,6 +10,7 @@ def profile_search():
         search_stats['nodes_searched'] = 0
         search_stats['tt_hits'] = 0
         search_stats['tt_stores'] = 0
+        search_stats['beta_cutoffs'] = 0
         
         b = Board()
         score, move = negamax(b, depth, float('-inf'), float('inf'))
@@ -30,6 +31,7 @@ def profile_iterative_deepening():
     search_stats['nodes_searched'] = 0
     search_stats['tt_hits'] = 0
     search_stats['tt_stores'] = 0
+    search_stats['beta_cutoffs'] = 0
     
     b = Board()
     start = time.time()
@@ -47,6 +49,7 @@ def profile_iterative_deepening():
         search_stats['nodes_searched'] = 0
         search_stats['tt_hits'] = 0
         search_stats['tt_stores'] = 0
+        search_stats['beta_cutoffs'] = 0
         
         b = Board()
         start = time.time()

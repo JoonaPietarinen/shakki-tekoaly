@@ -1,4 +1,3 @@
-import copy
 import random
 
 FILES = "abcdefgh"
@@ -25,36 +24,6 @@ ZOBRIST_CASTLING = {
 ZOBRIST_EP = [random.getrandbits(64) for _ in range(8)]
 
 
-def compute_zobrist_hash(board):
-    """
-    Compute Zobrist hash for the current board position.
-    Used for transposition table lookups.
-    """
-    h = 0
-    
-    for r in range(8):
-        for c in range(8):
-            piece = board.grid[r][c]
-            if piece != '.':
-                square_index = r * 8 + c
-                h ^= ZOBRIST_TABLE[piece][square_index]
-    
-    if board.turn == 'w':
-        h ^= ZOBRIST_WHITE
-    else:
-        h ^= ZOBRIST_BLACK
-
-    for right in board.castling:
-        if right in ZOBRIST_CASTLING:
-            h ^= ZOBRIST_CASTLING[right]
-
-    if board.en_passant:
-        ep_file = ord(board.en_passant[0]) - ord('a')
-        h ^= ZOBRIST_EP[ep_file]
-    
-    return h
-
-
 def coord_to_sq(coord: str):
     """Convert algebraic notation like 'e4' to (row, col) indices."""
     col = FILES.index(coord[0])
@@ -74,7 +43,7 @@ class Board:
             self.set_fen(START_FEN)
 
     def set_fen(self, fen: str):
-        """Parse FEN string into internal board state."""
+        """Parse FEN string into internal board state and compute initial hash."""
         if fen == "startpos_fen":
             fen = START_FEN
         parts = fen.split()
@@ -93,6 +62,39 @@ class Board:
         self.en_passant = parts[3] if parts[3] != '-' else None
         self.halfmove = int(parts[4])
         self.fullmove = int(parts[5])
+        
+        # Compute initial Zobrist hash
+        self.hash = self._compute_hash()
+    
+    def _compute_hash(self):
+        """Compute Zobrist hash for the current board position."""
+        h = 0
+        
+        # Hash pieces
+        for r in range(8):
+            for c in range(8):
+                piece = self.grid[r][c]
+                if piece != '.':
+                    square_index = r * 8 + c
+                    h ^= ZOBRIST_TABLE[piece][square_index]
+        
+        # Hash turn
+        if self.turn == 'w':
+            h ^= ZOBRIST_WHITE
+        else:
+            h ^= ZOBRIST_BLACK
+
+        # Hash castling rights
+        for right in self.castling:
+            if right in ZOBRIST_CASTLING:
+                h ^= ZOBRIST_CASTLING[right]
+
+        # Hash en passant
+        if self.en_passant:
+            ep_file = ord(self.en_passant[0]) - ord('a')
+            h ^= ZOBRIST_EP[ep_file]
+        
+        return h
 
     def to_fen(self) -> str:
         """Convert internal board state back to FEN string."""
@@ -119,6 +121,7 @@ class Board:
         """
         Apply a move in UCI format to the board.
         Handles castling, en passant, promotion, and updates board state.
+        Updates Zobrist hash incrementally for better performance.
         """
         from_sq = move_uci[:2]
         to_sq = move_uci[2:4]
@@ -132,30 +135,79 @@ class Board:
         direction = -1 if piece.isupper() else 1
         capture = self.grid[tr][tc] != '.'
 
-        # En passant capture
-        if piece.lower() == 'p' and fc != tc and self.grid[tr][tc] == '.' and self.en_passant == to_sq:
-            self.grid[tr - direction][tc] = '.'
-            capture = True
+        # Remove old en passant from hash
+        if self.en_passant:
+            ep_file = ord(self.en_passant[0]) - ord('a')
+            self.hash ^= ZOBRIST_EP[ep_file]
+        
+        # Remove old castling rights from hash
+        for right in self.castling:
+            if right in ZOBRIST_CASTLING:
+                self.hash ^= ZOBRIST_CASTLING[right]
+        
+        # Remove piece from source square
+        from_index = fr * 8 + fc
+        self.hash ^= ZOBRIST_TABLE[piece][from_index]
 
+        # En passant capture
+        ep_capture = False
+        if piece.lower() == 'p' and fc != tc and self.grid[tr][tc] == '.' and self.en_passant == to_sq:
+            # Remove captured pawn from hash
+            captured_pawn_row = tr - direction
+            captured_pawn = self.grid[captured_pawn_row][tc]
+            captured_index = captured_pawn_row * 8 + tc
+            self.hash ^= ZOBRIST_TABLE[captured_pawn][captured_index]
+            
+            self.grid[captured_pawn_row][tc] = '.'
+            capture = True
+            ep_capture = True
+
+        # Remove captured piece from hash (if not en passant)
+        if capture and not ep_capture and self.grid[tr][tc] != '.':
+            captured_piece = self.grid[tr][tc]
+            to_index = tr * 8 + tc
+            self.hash ^= ZOBRIST_TABLE[captured_piece][to_index]
+
+        # Move piece
         self.grid[fr][fc] = '.'
         if promo:
-            self.grid[tr][tc] = promo.upper() if piece.isupper() else promo.lower()
+            promoted_piece = promo.upper() if piece.isupper() else promo.lower()
+            self.grid[tr][tc] = promoted_piece
+            # Add promoted piece to hash
+            to_index = tr * 8 + tc
+            self.hash ^= ZOBRIST_TABLE[promoted_piece][to_index]
         else:
             self.grid[tr][tc] = piece
+            # Add piece to destination square
+            to_index = tr * 8 + tc
+            self.hash ^= ZOBRIST_TABLE[piece][to_index]
 
-        # Castling: move the rook
+        # Castling: move the rook and update hash
         if piece.lower() == 'k' and abs(tc - fc) == 2:
-            if tc > fc:
+            if tc > fc:  # Kingside
                 rook_from = (fr, 7)
                 rook_to = (fr, 5)
-            else:
+            else:  # Queenside
                 rook_from = (fr, 0)
                 rook_to = (fr, 3)
+            
             rook_piece = self.grid[rook_from[0]][rook_from[1]]
+            
+            # Remove rook from old position in hash
+            rook_from_index = rook_from[0] * 8 + rook_from[1]
+            self.hash ^= ZOBRIST_TABLE[rook_piece][rook_from_index]
+            
+            # Move rook
             self.grid[rook_from[0]][rook_from[1]] = '.'
             self.grid[rook_to[0]][rook_to[1]] = rook_piece
+            
+            # Add rook to new position in hash
+            rook_to_index = rook_to[0] * 8 + rook_to[1]
+            self.hash ^= ZOBRIST_TABLE[rook_piece][rook_to_index]
 
         # Update castling rights
+        old_castling = self.castling
+        
         def remove_castling(right: str):
             if right in self.castling:
                 self.castling = self.castling.replace(right, '')
@@ -185,11 +237,19 @@ class Board:
 
         if not self.castling:
             self.castling = '-'
+        
+        # Add new castling rights to hash
+        for right in self.castling:
+            if right in ZOBRIST_CASTLING:
+                self.hash ^= ZOBRIST_CASTLING[right]
 
         # Set en passant target after double pawn push
         if piece.lower() == 'p' and abs(tr - fr) == 2:
             mid_row = (tr + fr) // 2
             self.en_passant = sq_to_coord(mid_row, fc)
+            # Add new en passant to hash
+            ep_file = ord(self.en_passant[0]) - ord('a')
+            self.hash ^= ZOBRIST_EP[ep_file]
         else:
             self.en_passant = None
 
@@ -202,16 +262,29 @@ class Board:
         if self.turn == 'b':
             self.fullmove += 1
 
+        # Toggle turn in hash
+        self.hash ^= ZOBRIST_WHITE
+        self.hash ^= ZOBRIST_BLACK
+        
         self.turn = 'b' if self.turn == 'w' else 'w'
 
     def copy(self):
-        """Create a deep copy of the board for search calculations."""
-        new_board = Board()
-        new_board.grid = copy.deepcopy(self.grid)
+        """Create a shallow copy of the board for search calculations."""
+        new_board = Board.__new__(Board)  # Create without calling __init__
+        new_board.grid = [row[:] for row in self.grid]  # Shallow copy of lists
         new_board.turn = self.turn
         new_board.castling = self.castling
         new_board.en_passant = self.en_passant
         new_board.halfmove = self.halfmove
         new_board.fullmove = self.fullmove
+        new_board.hash = self.hash
         return new_board
+
+    def __hash__(self):
+        """Return the Zobrist hash of the current position."""
+        return self.hash
+
+    def __eq__(self, other):
+        """Check if two boards are equal (for caching)."""
+        return self.grid == other.grid and self.turn == other.turn and self.castling == other.castling and self.en_passant == other.en_passant and self.halfmove == other.halfmove and self.fullmove == other.fullmove
 
