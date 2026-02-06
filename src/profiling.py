@@ -2,6 +2,9 @@
 from board import Board
 from search import negamax, find_best_move, clear_transposition_table, print_search_stats, search_stats
 import time
+import cProfile
+import pstats
+from io import StringIO
 
 def profile_search():
     """Profile negamax with different depths."""
@@ -44,7 +47,7 @@ def profile_iterative_deepening():
     print(f"Best move: {move}")
     
     # Test 2: Time limit tests
-    for time_limit in [0.1, 0.5, 1, 2, 180]:
+    for time_limit in [0.1, 0.5, 1, 2, 5]:
         clear_transposition_table()
         search_stats['nodes_searched'] = 0
         search_stats['tt_hits'] = 0
@@ -62,6 +65,39 @@ def profile_iterative_deepening():
         print(f"Best move: {move}")
 
 
+def detailed_profile():
+    """Run cProfile to see where time is spent."""
+    print("\n" + "="*50)
+    print("DETAILED PROFILING (cProfile)")
+    print("="*50)
+    
+    clear_transposition_table()
+    search_stats['nodes_searched'] = 0
+    search_stats['tt_hits'] = 0
+    search_stats['tt_stores'] = 0
+    search_stats['beta_cutoffs'] = 0
+    
+    b = Board()
+    
+    # Profile depth 4 search
+    profiler = cProfile.Profile()
+    profiler.enable()
+    
+    score, move = negamax(b, 4, float('-inf'), float('inf'))
+    
+    profiler.disable()
+    
+    # Print stats
+    s = StringIO()
+    ps = pstats.Stats(profiler, stream=s).sort_stats('cumulative')
+    ps.print_stats(20)  # Top 20 functions
+    
+    print(s.getvalue())
+    print(f"\nBest move: {move}")
+    print_search_stats()
+
+
 if __name__ == "__main__":
     profile_search()
     profile_iterative_deepening()
+    detailed_profile()
