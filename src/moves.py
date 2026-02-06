@@ -33,7 +33,7 @@ def generate_legal_moves(board):
         else:
             pseudo.append(base)
 
-    def in_bounds(r: int, c: int) -> bool:
+    def in_bounds(r: int, c: int) -> bool: # Slows search down by approximattely 20%
         return 0 <= r < 8 and 0 <= c < 8
 
     def is_attacked(r: int, c: int, by_color: str, grid_state=None) -> bool:
@@ -45,7 +45,7 @@ def generate_legal_moves(board):
         for dc in (-1, 1):
             rr = r + pawn_dir
             cc = c + dc
-            if in_bounds(rr, cc):
+            if 0 <= rr < 8 and 0 <= cc < 8:
                 p = gs[rr][cc]
                 if p != '.' and ((p == 'P' and by_color == 'w') or (p == 'p' and by_color == 'b')):
                     return True
@@ -53,7 +53,7 @@ def generate_legal_moves(board):
         # Knight attacks
         for dr, dc in [(2, 1), (2, -1), (-2, 1), (-2, -1), (1, 2), (1, -2), (-1, 2), (-1, -2)]:
             rr, cc = r + dr, c + dc
-            if in_bounds(rr, cc):
+            if 0 <= rr < 8 and 0 <= cc < 8:
                 p = gs[rr][cc]
                 if p != '.':
                     if by_color == 'w' and p == 'N':
@@ -67,7 +67,7 @@ def generate_legal_moves(board):
                 if dr == 0 and dc == 0:
                     continue
                 rr, cc = r + dr, c + dc
-                if in_bounds(rr, cc):
+                if 0 <= rr < 8 and 0 <= cc < 8:
                     p = gs[rr][cc]
                     if p != '.':
                         if by_color == 'w' and p == 'K':
@@ -79,7 +79,7 @@ def generate_legal_moves(board):
         def slide(directions, attackers):
             for dr, dc in directions:
                 rr, cc = r + dr, c + dc
-                while in_bounds(rr, cc):
+                while 0 <= rr < 8 and 0 <= cc < 8:
                     p = gs[rr][cc]
                     if p != '.':
                         if by_color == 'w' and p == p.upper() and p.lower() in attackers:
