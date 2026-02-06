@@ -101,7 +101,7 @@ def negamax(board, depth, alpha, beta, color=1, tt_move=None, ply=0):
     
     for move in ordered_moves:
         temp = board.copy()
-        temp.make_move(move)
+        _ = temp.make_move(move)
         
         # Recursive negamax call (negate score and swap alpha/beta)
         score, _ = negamax(temp, depth - 1, -beta, -alpha, ply=ply+1)
@@ -175,7 +175,7 @@ def find_best_move(board, depth, time_limit):
             best_move = move
             best_score = score
     
-    return best_move, best_score
+    return best_move
 
 def print_search_stats():
     print(f"Nodes searched: {search_stats['nodes_searched']}")

@@ -2,7 +2,7 @@
 Test suite for transposition table functionality.
 """
 
-from board import Board, compute_zobrist_hash
+from board import Board
 import search
 
 
@@ -11,8 +11,8 @@ def test_zobrist_hash_consistent():
     b1 = Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
     b2 = Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
     
-    hash1 = compute_zobrist_hash(b1)
-    hash2 = compute_zobrist_hash(b2)
+    hash1 = Board._compute_hash(b1)
+    hash2 = Board._compute_hash(b2)
     
     assert hash1 == hash2, "Same position should have same hash"
 
@@ -22,8 +22,8 @@ def test_zobrist_hash_different():
     b1 = Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
     b2 = Board("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1")
     
-    hash1 = compute_zobrist_hash(b1)
-    hash2 = compute_zobrist_hash(b2)
+    hash1 = Board._compute_hash(b1)
+    hash2 = Board._compute_hash(b2)
     
     assert hash1 != hash2, "Different positions should have different hashes"
 
@@ -37,7 +37,7 @@ def test_transposition_table_stores_result():
     score1, move1 = search.negamax(b, depth=2, alpha=float('-inf'), beta=float('inf'))
     
     # Check if result was stored
-    board_hash = compute_zobrist_hash(b)
+    board_hash = Board._compute_hash(b)
     assert board_hash in search.transposition_table, "Result should be stored in TT"
     assert search.transposition_table[board_hash]['move'] == move1
 
@@ -49,7 +49,7 @@ def test_transposition_table_exact_flag():
     
     score, move = search.negamax(b, depth=2, alpha=float('-inf'), beta=float('inf'))
     
-    board_hash = compute_zobrist_hash(b)
+    board_hash = Board._compute_hash(b)
     entry = search.transposition_table[board_hash]
     
     # With full window (-inf, +inf), should store EXACT
@@ -64,7 +64,7 @@ def test_transposition_table_upper_bound():
     # Narrow window that might cause cutoff
     score, move = search.negamax(b, depth=2, alpha=-50, beta=50)
     
-    board_hash = compute_zobrist_hash(b)
+    board_hash = Board._compute_hash(b)
     entry = search.transposition_table[board_hash]
     
     # Result should be stored with appropriate flag
@@ -86,7 +86,7 @@ def test_transposition_table_lookup_with_bounds():
     assert score1 == score2, "Same search should return same score"
     assert move1 == move2, "Same search should return same move"
     # TT should have been hit on second search
-    board_hash = compute_zobrist_hash(b)
+    board_hash = Board._compute_hash(b)
     assert board_hash in search.transposition_table, "Position should be in TT"
 
 
@@ -120,7 +120,7 @@ def test_transposition_table_depth_cutoff():
     # Search at depth 2
     score_d2, move_d2 = search.negamax(b, depth=2, alpha=float('-inf'), beta=float('inf'))
     
-    board_hash = compute_zobrist_hash(b)
+    board_hash = Board._compute_hash(b)
     entry_after_d2 = search.transposition_table[board_hash]
     
     assert entry_after_d2['depth'] == 2, "Should store depth 2 result"

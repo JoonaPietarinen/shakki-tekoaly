@@ -85,9 +85,10 @@ class Board:
             h ^= ZOBRIST_BLACK
 
         # Hash castling rights
-        for right in self.castling:
-            if right in ZOBRIST_CASTLING:
-                h ^= ZOBRIST_CASTLING[right]
+        if self.castling != '-':
+            for right in self.castling:
+                if right in ZOBRIST_CASTLING:
+                    h ^= ZOBRIST_CASTLING[right]
 
         # Hash en passant
         if self.en_passant:
@@ -121,7 +122,10 @@ class Board:
         """
         Apply a move in UCI format to the board.
         Handles castling, en passant, promotion, and updates board state.
-        Updates Zobrist hash incrementally for better performance.
+        Updates Zobrist hash incrementally for performance.
+        
+        Returns:
+            Undo info dict that can be passed to unmake_move() to revert the move.
         """
         from_sq = move_uci[:2]
         to_sq = move_uci[2:4]
@@ -132,6 +136,22 @@ class Board:
         if piece == '.':
             raise ValueError("No piece on from-square")
 
+        # Save state for undo (including coordinates to avoid reparsing)
+        undo_info = {
+            'fr': fr, 'fc': fc, 'tr': tr, 'tc': tc,  # Coordinates
+            'piece': piece,
+            'captured': self.grid[tr][tc],
+            'old_castling': self.castling,
+            'old_en_passant': self.en_passant,
+            'old_halfmove': self.halfmove,
+            'old_fullmove': self.fullmove,
+            'old_hash': self.hash,
+            'old_turn': self.turn,
+            'ep_capture_square': None,
+            'castling_rook_move': None,
+            'promo': promo
+        }
+
         direction = -1 if piece.isupper() else 1
         capture = self.grid[tr][tc] != '.'
 
@@ -141,9 +161,10 @@ class Board:
             self.hash ^= ZOBRIST_EP[ep_file]
         
         # Remove old castling rights from hash
-        for right in self.castling:
-            if right in ZOBRIST_CASTLING:
-                self.hash ^= ZOBRIST_CASTLING[right]
+        if self.castling != '-':
+            for right in self.castling:
+                if right in ZOBRIST_CASTLING:
+                    self.hash ^= ZOBRIST_CASTLING[right]
         
         # Remove piece from source square
         from_index = fr * 8 + fc
@@ -157,6 +178,9 @@ class Board:
             captured_pawn = self.grid[captured_pawn_row][tc]
             captured_index = captured_pawn_row * 8 + tc
             self.hash ^= ZOBRIST_TABLE[captured_pawn][captured_index]
+            
+            # Save for undo
+            undo_info['ep_capture_square'] = (captured_pawn_row, tc, captured_pawn)
             
             self.grid[captured_pawn_row][tc] = '.'
             capture = True
@@ -192,6 +216,9 @@ class Board:
                 rook_to = (fr, 3)
             
             rook_piece = self.grid[rook_from[0]][rook_from[1]]
+            
+            # Save for undo
+            undo_info['castling_rook_move'] = (rook_from, rook_to, rook_piece)
             
             # Remove rook from old position in hash
             rook_from_index = rook_from[0] * 8 + rook_from[1]
@@ -239,9 +266,10 @@ class Board:
             self.castling = '-'
         
         # Add new castling rights to hash
-        for right in self.castling:
-            if right in ZOBRIST_CASTLING:
-                self.hash ^= ZOBRIST_CASTLING[right]
+        if self.castling != '-':
+            for right in self.castling:
+                if right in ZOBRIST_CASTLING:
+                    self.hash ^= ZOBRIST_CASTLING[right]
 
         # Set en passant target after double pawn push
         if piece.lower() == 'p' and abs(tr - fr) == 2:
@@ -267,7 +295,47 @@ class Board:
         self.hash ^= ZOBRIST_BLACK
         
         self.turn = 'b' if self.turn == 'w' else 'w'
-
+        
+        return undo_info
+    
+    def unmake_move(self, undo_info):
+        """
+        Undo a move using the undo_info returned by make_move().
+        Restores the board to its previous state.
+        """
+        # Get coordinates directly from undo_info (no parsing needed)
+        fr = undo_info['fr']
+        fc = undo_info['fc']
+        tr = undo_info['tr']
+        tc = undo_info['tc']
+        promo = undo_info['promo']
+        piece = undo_info['piece']
+        
+        # Restore piece to original square
+        self.grid[fr][fc] = piece
+        
+        # Restore captured piece (or empty square)
+        self.grid[tr][tc] = undo_info['captured']
+        
+        # Restore en passant capture
+        if undo_info['ep_capture_square']:
+            ep_row, ep_col, ep_piece = undo_info['ep_capture_square']
+            self.grid[ep_row][ep_col] = ep_piece
+        
+        # Restore castling rook
+        if undo_info['castling_rook_move']:
+            rook_from, rook_to, rook_piece = undo_info['castling_rook_move']
+            self.grid[rook_from[0]][rook_from[1]] = rook_piece
+            self.grid[rook_to[0]][rook_to[1]] = '.'
+        
+        # Restore all state variables
+        self.castling = undo_info['old_castling']
+        self.en_passant = undo_info['old_en_passant']
+        self.halfmove = undo_info['old_halfmove']
+        self.fullmove = undo_info['old_fullmove']
+        self.hash = undo_info['old_hash']
+        self.turn = undo_info['old_turn']
+    
     def copy(self):
         """Create a shallow copy of the board for search calculations."""
         new_board = Board.__new__(Board)  # Create without calling __init__
@@ -279,12 +347,3 @@ class Board:
         new_board.fullmove = self.fullmove
         new_board.hash = self.hash
         return new_board
-
-    def __hash__(self):
-        """Return the Zobrist hash of the current position."""
-        return self.hash
-
-    def __eq__(self, other):
-        """Check if two boards are equal (for caching)."""
-        return self.grid == other.grid and self.turn == other.turn and self.castling == other.castling and self.en_passant == other.en_passant and self.halfmove == other.halfmove and self.fullmove == other.fullmove
-

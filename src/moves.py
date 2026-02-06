@@ -194,9 +194,13 @@ def generate_legal_moves(board):
     # Filter out moves that leave own king in check
     legal = []
     for m in pseudo:
-        temp = board.copy()
         mover = color
-        temp.make_move(m)
+        
+        # Copy board and make move
+        temp = board.copy()
+        _ = temp.make_move(m)
+        
+        # Find king position after move
         king_pos = None
         for r in range(8):
             for c in range(8):
@@ -206,9 +210,14 @@ def generate_legal_moves(board):
                     break
             if king_pos:
                 break
-        if not king_pos:
-            continue
-        if not is_attacked(king_pos[0], king_pos[1], temp.turn, temp.grid):
+        
+        # Check if king is safe
+        is_legal = False
+        if king_pos:
+            if not is_attacked(king_pos[0], king_pos[1], temp.turn, temp.grid):
+                is_legal = True
+        
+        if is_legal:
             legal.append(m)
 
     return legal
