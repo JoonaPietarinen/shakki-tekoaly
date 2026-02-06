@@ -10,7 +10,7 @@ def set_board(board: Board, board_position: str):
     board.set_fen(board_position)
 
 
-def make_move(board: Board, search_depth=4):
+def make_move(board: Board, search_depth, time_limit):
     """
     Select and play the best move using negamax search.
     
@@ -34,7 +34,7 @@ def make_move(board: Board, search_depth=4):
         print("Draw by fifty-move rule!")
     
     print(f"Searching with depth {search_depth}...")
-    choice = find_best_move(board, depth=search_depth)
+    choice = find_best_move(board, depth=search_depth, time_limit=time_limit)
     
     board.make_move(choice)
     return choice
@@ -43,7 +43,8 @@ def make_move(board: Board, search_depth=4):
 def main():
     """Main loop: receive commands and play moves."""
     board = Board()
-    search_depth = 4
+    search_depth = 10
+    time_limit = 180
     
     while True:
         opponent_move = input()
@@ -56,7 +57,7 @@ def main():
             print("Board reset!")
         elif opponent_move.startswith("PLAY:"):
             try:
-                choice = make_move(board, search_depth=search_depth)
+                choice = make_move(board, search_depth=search_depth, time_limit=time_limit)
                 print(f"I chose {choice}!")
                 print(f"MOVE:{choice}")
             except RuntimeError as e:

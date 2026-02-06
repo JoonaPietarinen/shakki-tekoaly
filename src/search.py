@@ -17,7 +17,7 @@ search_stats = {
 # Transposition table flags
 EXACT, LOWER, UPPER = 0, 1, 2
 
-# Transposition table: {hash: (depth, score, flag, best_move)}
+# Transposition table: {zobrist_hash: (depth, score, flag, best_move)}
 transposition_table = {}
 
 
@@ -112,24 +112,40 @@ def negamax(board, depth, alpha, beta, color=1, tt_move=None):
         'move': best_move
     }
     search_stats['tt_stores'] += 1
-    #print(transposition_table)
-    #print(search_stats['nodes_searched'])
     return best_score, best_move
 
-
-def iterative_deepening(board, max_depth, time_limit=None):
+def find_best_move(board, depth, time_limit):
     """
-    Iterative deepening search: search depth 1, 2, 3... up to max_depth.
-    Stops early if time limit is exceeded.
+    Find the best move using iterative deepening with negamax search and transposition table.
+    Instead of soft or hard time limits, we use smart time management to decide when to stop deepening.
     """
-    # TODO:
-    pass
-
-
-def find_best_move(board, depth):
-    """Find the best move using negamax search with transposition table."""
-    _, best_move = negamax(board, depth, float('-inf'), float('inf'))
-    return best_move
+    best_move = None
+    best_score = None
+    start_time = time.time()
+    
+    # Iterative deepening: search depth 1, 2, 3... up to max_depth
+    for current_depth in range(1, depth + 1):
+        elapsed = time.time() - start_time
+        
+        # Smart time management: don't start new iteration if unlikely to finish
+        if time_limit:
+            if elapsed > time_limit:
+                # Soft limit: time expired, use best move from previous iteration
+                break
+            
+            # Predict if we have enough time for next iteration
+            # Next depth typically takes ~3-5x longer than previous
+            # Don't start if we've used more than 40% of time budget
+            if current_depth > 1 and elapsed > 0.4 * time_limit:
+                break
+        
+        score, move = negamax(board, current_depth, float('-inf'), float('inf'))
+        
+        if move:
+            best_move = move
+            best_score = score
+    
+    return best_move, best_score
 
 def print_search_stats():
     print(f"Nodes searched: {search_stats['nodes_searched']}")
