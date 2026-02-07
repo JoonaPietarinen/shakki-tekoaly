@@ -3,7 +3,7 @@ Test suite for chess engine core functionality.
 """
 
 from board import Board
-from moves import generate_legal_moves
+from moves import generate_legal_moves, is_checkmate, is_stalemate
 
 
 def test_start_position():
@@ -42,9 +42,11 @@ def test_checkmate():
     b = Board("rk6/8/8/8/8/8/8/Kqr5 w KQkq - 0 1")
     moves = generate_legal_moves(b)
     assert len(moves) == 0, "Should be checkmate"
+    assert is_checkmate(b), "Should be True"
 
 def test_stalemate():
     """Test stalemate detection."""
     b = Board("7k/5Q2/6K1/8/8/8/8/8 b - - 0 1")
     moves = generate_legal_moves(b)
     assert len(moves) == 0, "Should be stalemate"
+    assert is_stalemate(b), "Should be True"    

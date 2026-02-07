@@ -177,7 +177,7 @@ def find_best_move(board, depth, time_limit):
     
     return best_move
 
-def print_search_stats():
+def print_search_stats(): # pragma: no cover
     print(f"Nodes searched: {search_stats['nodes_searched']}")
     print(f"TT hits: {search_stats['tt_hits']} ({100*search_stats['tt_hits']/search_stats['nodes_searched']:.1f}%)")
     print(f"TT stores: {search_stats['tt_stores']}")

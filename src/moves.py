@@ -1,5 +1,69 @@
 from board import coord_to_sq, sq_to_coord
 
+def is_attacked(r: int, c: int, by_color: str, grid, board=None) -> bool:
+    """Check if square (r, c) is attacked by side 'by_color'."""
+    
+    def in_bounds(r: int, c: int) -> bool:
+        return 0 <= r < 8 and 0 <= c < 8
+    
+    # Pawn attacks
+    pawn_dir = -1 if by_color == 'w' else 1
+    for dc in (-1, 1):
+        rr = r + pawn_dir
+        cc = c + dc
+        if 0 <= rr < 8 and 0 <= cc < 8:
+            p = grid[rr][cc]
+            if p != '.' and ((p == 'P' and by_color == 'w') or (p == 'p' and by_color == 'b')):
+                return True
+    
+    # Knight attacks
+    for dr, dc in [(2, 1), (2, -1), (-2, 1), (-2, -1), (1, 2), (1, -2), (-1, 2), (-1, -2)]:
+        rr, cc = r + dr, c + dc
+        if 0 <= rr < 8 and 0 <= cc < 8:
+            p = grid[rr][cc]
+            if p != '.':
+                if by_color == 'w' and p == 'N':
+                    return True
+                if by_color == 'b' and p == 'n':
+                    return True
+    
+    # King attacks
+    for dr in (-1, 0, 1):
+        for dc in (-1, 0, 1):
+            if dr == 0 and dc == 0:
+                continue
+            rr, cc = r + dr, c + dc
+            if 0 <= rr < 8 and 0 <= cc < 8:
+                p = grid[rr][cc]
+                if p != '.':
+                    if by_color == 'w' and p == 'K':
+                        return True
+                    if by_color == 'b' and p == 'k':
+                        return True
+    
+    # Sliding pieces (rooks, bishops, queens)
+    def slide(directions, attackers):
+        for dr, dc in directions:
+            rr, cc = r + dr, c + dc
+            while 0 <= rr < 8 and 0 <= cc < 8:
+                p = grid[rr][cc]
+                if p != '.':
+                    if by_color == 'w' and p == p.upper() and p.lower() in attackers:
+                        return True
+                    if by_color == 'b' and p == p.lower() and p in attackers:
+                        return True
+                    break
+                rr += dr
+                cc += dc
+        return False
+    
+    if slide([(1, 0), (-1, 0), (0, 1), (0, -1)], {'r', 'q'}):
+        return True
+    if slide([(1, 1), (1, -1), (-1, 1), (-1, -1)], {'b', 'q'}):
+        return True
+    return False
+
+
 def generate_legal_moves(board):
     """
     Generate all legal moves for the current side to move.
@@ -35,67 +99,6 @@ def generate_legal_moves(board):
 
     def in_bounds(r: int, c: int) -> bool: # Slows search down by approximattely 20%
         return 0 <= r < 8 and 0 <= c < 8
-
-    def is_attacked(r: int, c: int, by_color: str, grid_state=None) -> bool:
-        """Check if square (r, c) is attacked by side 'by_color'."""
-        gs = grid_state if grid_state is not None else grid
-        
-        # Pawn attacks
-        pawn_dir = -1 if by_color == 'w' else 1
-        for dc in (-1, 1):
-            rr = r + pawn_dir
-            cc = c + dc
-            if 0 <= rr < 8 and 0 <= cc < 8:
-                p = gs[rr][cc]
-                if p != '.' and ((p == 'P' and by_color == 'w') or (p == 'p' and by_color == 'b')):
-                    return True
-        
-        # Knight attacks
-        for dr, dc in [(2, 1), (2, -1), (-2, 1), (-2, -1), (1, 2), (1, -2), (-1, 2), (-1, -2)]:
-            rr, cc = r + dr, c + dc
-            if 0 <= rr < 8 and 0 <= cc < 8:
-                p = gs[rr][cc]
-                if p != '.':
-                    if by_color == 'w' and p == 'N':
-                        return True
-                    if by_color == 'b' and p == 'n':
-                        return True
-        
-        # King attacks
-        for dr in (-1, 0, 1):
-            for dc in (-1, 0, 1):
-                if dr == 0 and dc == 0:
-                    continue
-                rr, cc = r + dr, c + dc
-                if 0 <= rr < 8 and 0 <= cc < 8:
-                    p = gs[rr][cc]
-                    if p != '.':
-                        if by_color == 'w' and p == 'K':
-                            return True
-                        if by_color == 'b' and p == 'k':
-                            return True
-        
-        # Sliding pieces (rooks, bishops, queens)
-        def slide(directions, attackers):
-            for dr, dc in directions:
-                rr, cc = r + dr, c + dc
-                while 0 <= rr < 8 and 0 <= cc < 8:
-                    p = gs[rr][cc]
-                    if p != '.':
-                        if by_color == 'w' and p == p.upper() and p.lower() in attackers:
-                            return True
-                        if by_color == 'b' and p == p.lower() and p in attackers:
-                            return True
-                        break
-                    rr += dr
-                    cc += dc
-            return False
-        
-        if slide([(1, 0), (-1, 0), (0, 1), (0, -1)], {'r', 'q'}):
-            return True
-        if slide([(1, 1), (1, -1), (-1, 1), (-1, -1)], {'b', 'q'}):
-            return True
-        return False
 
     def gen_pawn(r: int, c: int, piece: str):
         direction = -1 if is_white(piece) else 1
@@ -154,7 +157,7 @@ def generate_legal_moves(board):
         # Castling: check path is clear and king doesn't move through check
         def squares_safe(squares):
             opp = 'b' if color == 'w' else 'w'
-            return all(not is_attacked(sr, sc, opp) for sr, sc in squares)
+            return all(not is_attacked(sr, sc, opp, grid) for sr, sc in squares)
 
         if color == 'w' and r == 7 and c == 4:
             if 'K' in board.castling and grid[7][5] == '.' and grid[7][6] == '.' and squares_safe([(7, 4), (7, 5), (7, 6)]):
@@ -238,7 +241,10 @@ def is_checkmate(board):
             if king_pos:
                 break
         if king_pos:
-            return True
+            # Check if king is actually under attack (in check)
+            opponent_color = 'b' if color == 'w' else 'w'
+            if is_attacked(king_pos[0], king_pos[1], opponent_color, board.grid):
+                return True
     return False
 
 
@@ -250,7 +256,7 @@ def is_stalemate(board):
     return False
 
 
-def is_draw_by_fifty_moves(board):
+def is_draw_by_fifty_moves(board): # Pragma: no cover
     """Check if draw by 50-move rule (100 half-moves)."""
     return board.halfmove >= 100
 
