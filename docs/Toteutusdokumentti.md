@@ -48,15 +48,15 @@ Profiling-tulokset (src/profiling.py):
 
 `profile_iterative_deepening()`:
 
-| Time Limit | Reached Depth | Nodes | TT Hits | Best Move |
+| Time Limit | Actual Time | Reached Depth | Nodes | TT Hits | Best Move |
 |------------|----------------|-------|---------|-----------|
-| 0.1s | 5 | 2,044 | 1.1% | b1c3 |
-| 0.5s | 5 | 2,044 | 1.1% | b1c3 |
-| 1.0s | 6 | 22,260 | 1.3% | e2e4 |
-| 2.0s | 6 | 22,260 | 1.3% | e2e4 |
-| 5.0s | 7 | 121,914 | 3.2% | b1a3 |
+| 0.1s | 0.205s | 5 | 2,044 | 1.1% | b1c3 |
+| 0.5s | 0.205s | 5 | 2,044 | 1.1% | b1c3 |
+| 1.0s | 1.759s | 6 | 22,260 | 1.3% | e2e4 |
+| 2.0s | 1.759s | 6 | 22,260 | 1.3% | e2e4 |
+| 5.0s | 10.061s | 7 | 121,914 | 3.2% | b1a3 |
 
-**Huomio:** TT säilytetään iteraatioiden välillä → kumulatiivinen hyöty syvemmillä tasoilla
+**Huomio:** Time Limit voi ylittyä, jos uudella iteraatiolla aikaa on vielä yli 40% jäljellä. Toisaalta se voi myös alittua, jos aikaa on alle 40% jäljellä, jolloin iteraatio keskeytetään.
 
 **Toteutus:** Negamax + Alpha-Beta + Move Ordering (Killer Moves) + Transposition Table + Iterative Deepening
 
