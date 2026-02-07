@@ -10,7 +10,7 @@ CI-pipeline ajaa pytestit `src/tests` kansiosta.
 - AI haku algoritmi (src/tests/test_search.py)
 - Transpositiotaulut (src/tests/test_transposition.py)
 
-**Testien lukumäärä:** 24 testiä yhteensä
+**Testien lukumäärä:** 23 testiä yhteensä
 
 ---
 
@@ -35,6 +35,8 @@ CI-pipeline ajaa pytestit `src/tests` kansiosta.
 | test_promotion | "8/P7/8/8/8/8/8/K6k w - - 0 1" | Sisältää a7a8q, a7a8r, a7a8b, a7a8n | Pass |
 | test_castling | "r3k2r/8/.../8/R3K2R w KQkq - 0 1" | Sisältää e1g1 (kingside) ja e1c1 (queenside) | Pass |
 | test_en_passant | "rnbqkbnr/ppp1pppp/8/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 1" | Sisältää e5d6 (en passant) | Pass |
+| test_checkmate | "rk6/8/8/8/8/8/8/Kqr5 w KQkq - 0 1" | Ei liikkeitä, kuningas shakissa | Pass |
+| test_stalemate | "7k/5Q2/6K1/8/8/8/8/8 b - - 0 1" | Ei liikkeitä, kuningas ei shakissa | Pass |
 
 ### Transpositiotaulut (test_transposition.py)
 
@@ -44,7 +46,9 @@ CI-pipeline ajaa pytestit `src/tests` kansiosta.
 | test_zobrist_hash_different | Eri asemat | Hash1 != Hash2 | Pass |
 | test_transposition_table_stores_result | negamax(depth=2) | Tulos tallennetaan TT:hen | Pass |
 | test_transposition_table_exact_flag | negamax(-∞, +∞) | EXACT flag tallennettu | Pass |
+| test_transposition_table_upper_bound | negamax alpha cutoff | UPPER flag tallennettu | Pass |
 | test_transposition_table_lookup_with_bounds | Sama search 2x | Sama score ja move | Pass |
+| test_transposition_table_speedup | negamax 2x samalle asemalle | Toinen kutsu on nopeampi | Pass |
 | test_transposition_table_depth_cutoff | Depth 2 → Depth 3 | TT päivittyy syvempään | Pass |
 
 ### AI haku algoritmi (test_search.py)
