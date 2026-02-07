@@ -4,6 +4,7 @@
 Tällä viikolla pyrin nopeuttamaan tekoälyä. Paransin transpositiotaulun hyödyntämistä, siirtojen järjestystä sekä toteutin killer moves -optimoinnin.
 Tämän lisäksi aloin toteuttaa iteratiivisen syvenemisen haun kehitystä. 
 Testasin pelata tekoälyä vastaan ja totesin, että etenkin ilman kovaa aikarajaa 3 minuuttia aikaa per vuoro on melko paljon. Laskin ajan väliaikaisesti 30s per vuoro.
+Uudella aikarajalla ja nopeilla omilla siirroilla ottelu kesti noin 35 minuuttia, ja päättyi tekoälyn voittoon.
 
 **Miten ohjelma on edistynyt?**
 
