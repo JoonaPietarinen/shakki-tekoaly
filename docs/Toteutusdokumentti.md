@@ -49,7 +49,7 @@ Profiling-tulokset (src/profiling.py):
 `profile_iterative_deepening()`:
 
 | Time Limit | Actual Time | Reached Depth | Nodes | TT Hits | Best Move |
-|------------|----------------|-------|---------|-----------|
+|------------|----------------|----------------|-------|---------|-----------|
 | 0.1s | 0.205s | 5 | 2,044 | 1.1% | b1c3 |
 | 0.5s | 0.205s | 5 | 2,044 | 1.1% | b1c3 |
 | 1.0s | 1.759s | 6 | 22,260 | 1.3% | e2e4 |
