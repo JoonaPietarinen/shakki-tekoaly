@@ -33,7 +33,7 @@ def make_move(board: Board, search_depth, time_limit):
     if is_draw_by_fifty_moves(board):
         print("Draw by fifty-move rule!")
     
-    print(f"Searching with depth {search_depth}...")
+    print(f"Searching with depth {search_depth} and time limit {time_limit}s...")
     choice = find_best_move(board, depth=search_depth, time_limit=time_limit)
     
     board.make_move(choice)
