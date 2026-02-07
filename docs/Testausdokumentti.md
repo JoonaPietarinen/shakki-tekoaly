@@ -94,13 +94,23 @@ Käytetty: src/profile.py
 python src/profile.py
 ```
 
-**Tulokset (Negamax + Alpha-Beta + Move Ordering + Transposition Table):**
+**Tulokset:**
 
-| Depth | Nodes Searched | TT Hits | TT Stores | Best Move |
-|-------|----------------|---------|-----------|-----------|
-| 2 | 172 | 0 (0.0%) | 21 | b1c3 |
-| 3 | 759 | 21 (2.8%) | 63 | b1c3 |
-| 4 | 2,043 | 78 (3.8%) | 533 | b1c3 |
+| Depth | Nodes Searched | TT Hits | TT Stores | Beta Cutoffs | Best Move |
+|-------|----------------|---------|-----------|-----------|-----------|
+| 2 | 131 | 0 (0.0%) | 21 | 16 | b1c3 |
+| 3 | 545 | 0 (0.0%) | 60 | 38 | b1c3 |
+| 4 | 1,386 | 39 (2.8%) | 485 | 443 | b1c3 |
+| 5 | 18,771 | 241 (1.3%) | 2,389 | 1795 | e2e4 |
+
+iteratiivisen syventämisen tulokset:
+| Time Limit | Reached Depth | Nodes Searched | TT Hits | TT Stores | Beta Cutoffs | Best Move |
+|------------|----------------|----------------|---------|-----------|--------------|-----------|
+| 0.1s | 5 | 2,044 | 23 (1.1%) | 583 | 516 | b1c3 |
+| 0.5s | 5 | 2,044 | 23 (1.1%) | 583 | 516 | b1c3 |
+| 1.0s | 6 | 22,260 | 291 (1.3%) | 3,257 | 2,544 | e2e4 |
+| 2.0s | 6 | 22,260 | 291 (1.3%) | 3,257 | 2,544 | e2e4 |
+| 5.0s | 7 | 121,914 | 3,925 (3.2%) | 23,053 | 19,813 | b1a3 |
 
 Tätä käsitellään lisää tiedostossa `Toteutusrapostti.md`.
 
@@ -191,8 +201,6 @@ Zobrist hashing
 Transpositiotaulut  
 Negamax haku  
 Alpha-beta karsinta  
-
-### Ei vielä katetut
 Mattien tunnistaminen  
 Iteratiivinen syventäminen  
 Shakin tarkistus  
@@ -201,7 +209,7 @@ Shakin tarkistus
 
 ## Johtopäätökset
 
-- **24 yksikkötestiä** kattaa ydin ominaisuudet
+- **23 yksikkötestiä** kattaa ydin ominaisuudet
 - **Kaikki testit menevät läpi**
 - **Profilointi osoittaa** algoritmin tehokkuuden
 - **Deterministiset testit** toistettavissa milloin tahansa

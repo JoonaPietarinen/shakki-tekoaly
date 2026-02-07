@@ -11,7 +11,8 @@ search_stats = {
     'nodes_searched': 0,
     'tt_hits': 0,
     'tt_stores': 0,
-    'beta_cutoffs': 0
+    'beta_cutoffs': 0,
+    'reached_depth': 0
 }
 
 # Transposition table flags
@@ -149,12 +150,14 @@ def find_best_move(board, depth, time_limit):
     Find the best move using iterative deepening with negamax search and transposition table.
     Instead of soft or hard time limits, we use smart time management to decide when to stop deepening.
     """
+    global search_stats
     best_move = None
     best_score = None
     start_time = time.time()
     
     # Iterative deepening: search depth 1, 2, 3... up to max_depth
     for current_depth in range(1, depth + 1):
+        search_stats['reached_depth'] = current_depth  # Track current depth
         elapsed = time.time() - start_time
         
         # Smart time management: don't start new iteration if unlikely to finish
@@ -182,3 +185,5 @@ def print_search_stats(): # pragma: no cover
     print(f"TT hits: {search_stats['tt_hits']} ({100*search_stats['tt_hits']/search_stats['nodes_searched']:.1f}%)")
     print(f"TT stores: {search_stats['tt_stores']}")
     print(f"Beta cutoffs: {search_stats['beta_cutoffs']}")
+    if search_stats.get('reached_depth', 0) > 0:
+        print(f"Reached depth: {search_stats['reached_depth']}")

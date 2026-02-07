@@ -9,7 +9,7 @@ from io import StringIO
 def profile_search():
     """Profile negamax with different depths."""
     clear_transposition_table()
-    for depth in [2, 3, 4]:
+    for depth in [2, 3, 4, 5]:
         search_stats['nodes_searched'] = 0
         search_stats['tt_hits'] = 0
         search_stats['tt_stores'] = 0
@@ -53,6 +53,7 @@ def profile_iterative_deepening():
         search_stats['tt_hits'] = 0
         search_stats['tt_stores'] = 0
         search_stats['beta_cutoffs'] = 0
+        search_stats['reached_depth'] = 0
         
         b = Board()
         start = time.time()
@@ -62,6 +63,7 @@ def profile_iterative_deepening():
         print(f"\nTime limit: {time_limit}s (max_depth=10):")
         print(f"Actual time: {elapsed:.3f}s")
         print_search_stats()
+        print(f"Reached depth: {search_stats['reached_depth']}")
         print(f"Best move: {move}")
 
 
