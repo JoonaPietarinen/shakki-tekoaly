@@ -18,7 +18,8 @@ Projektin dokumentaatio kirjoitetaan suomeksi. Lähtökohtasesti kaikki muu proj
 
 ## Käyttö
 
-Harjoitustyössä käytän kurssin tarjoamaa tekoälyalustaa shakin pelaamiseen. Tekoälyni ei kommunikoi suoraan graafisen käyttöliittymän kanssa, vaan saa syötteet alustalta standard inputin kautta. Syötteet sisältävät kulloisenkin pelitilan (esim. tehdyt siirrot tai FEN-kuvauksen), ja ohjelma päivittää sisäisen shakkilaudan tilan näiden perusteella sekä palauttaa alustalle laskemansa siirron merkkijonona.
+Harjoitustyössä käytän kurssin tarjoamaa tekoälyalustaa shakin pelaamiseen. Tekoälyni ei kommunikoi suoraan graafisen käyttöliittymän kanssa, vaan saa syötteet alustalta standard inputin kautta. Syötteet sisältävät kulloisenkin pelitilan (esim. tehdyt siirrot tai FEN-kuvauksen), ja ohjelma päivittää sisäisen shakkilaudan tilan näiden perusteella sekä palauttaa alustalle laskemansa siirron merkkijonona. 
+
 Tekoälyä vastaan voi pelata esimerkiksi [Tira-ai](https://github.com/game-ai-platform-team/tira-ai-local?tab=readme-ov-file) alustan avulla. Alustan repositoriosta löytyy ohjeet sen käyttöön.
 
 ## Aika- ja tilavaativuudet
@@ -36,5 +37,6 @@ Projektissa käytän seuraavia lähteitä:
 [Alpha–beta pruning](https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning)
 
 [Transposition table](https://en.wikipedia.org/wiki/Transposition_table)
+
 
 
