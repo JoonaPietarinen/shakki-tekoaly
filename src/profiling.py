@@ -14,6 +14,7 @@ def profile_search():
         search_stats['tt_hits'] = 0
         search_stats['tt_stores'] = 0
         search_stats['beta_cutoffs'] = 0
+        search_stats['quiescence_nodes'] = 0
         
         b = Board()
         score, move = negamax(b, depth, float('-inf'), float('inf'))
@@ -35,6 +36,8 @@ def profile_iterative_deepening():
     search_stats['tt_hits'] = 0
     search_stats['tt_stores'] = 0
     search_stats['beta_cutoffs'] = 0
+    search_stats['reached_depth'] = 0
+    search_stats['quiescence_nodes'] = 0
     
     b = Board()
     start = time.time()
@@ -54,6 +57,7 @@ def profile_iterative_deepening():
         search_stats['tt_stores'] = 0
         search_stats['beta_cutoffs'] = 0
         search_stats['reached_depth'] = 0
+        search_stats['quiescence_nodes'] = 0
         
         b = Board()
         start = time.time()
@@ -78,14 +82,15 @@ def detailed_profile():
     search_stats['tt_hits'] = 0
     search_stats['tt_stores'] = 0
     search_stats['beta_cutoffs'] = 0
+    search_stats['quiescence_nodes'] = 0
     
     b = Board()
     
-    # Profile depth 6 search
+    # Profile depth 4 search
     profiler = cProfile.Profile()
     profiler.enable()
     
-    score, move = negamax(b, 6, float('-inf'), float('inf'))
+    score, move = negamax(b, 4, float('-inf'), float('inf'))
     
     profiler.disable()
     

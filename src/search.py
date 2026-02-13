@@ -1,10 +1,12 @@
 """
 Chess AI search algorithms.
 Negamax with alpha-beta pruning and transposition table.
+Includes quiescence search to avoid horizon effect.
 """
 
 from evaluation import evaluate_from_perspective
 from moves import generate_legal_moves
+from board import coord_to_sq
 import time
 
 search_stats = {
@@ -12,7 +14,8 @@ search_stats = {
     'tt_hits': 0,
     'tt_stores': 0,
     'beta_cutoffs': 0,
-    'reached_depth': 0
+    'reached_depth': 0,
+    'quiescence_nodes': 0
 }
 
 # Transposition table flags
@@ -31,6 +34,62 @@ def clear_transposition_table():
     global transposition_table, killer_moves
     transposition_table = {}
     killer_moves = [[None, None] for _ in range(MAX_DEPTH)]
+
+
+def is_capture(board, move: str) -> bool:
+    """Check if move is a capture."""
+    to_sq = move[2:4]
+    tr, tc = coord_to_sq(to_sq)
+    return board.grid[tr][tc] != '.'
+
+
+def quiescence(board, alpha, beta, ply=0):
+    """
+    Quiescence search: search only captures until position is quiet.
+    Solves horizon effect by continuing search at peaceful positions.
+    
+    Args:
+        board: Current board state
+        alpha: Alpha bound
+        beta: Beta bound
+        ply: Current ply (for depth limiting)
+    
+    Returns:
+        Best score for current position
+    """
+    global search_stats
+    search_stats['quiescence_nodes'] += 1
+    
+    # Stand pat: evaluate current position
+    # If position is already good enough, we don't need to search further
+    stand_pat = evaluate_from_perspective(board)
+    
+    if stand_pat >= beta:
+        return beta
+    
+    alpha = max(alpha, stand_pat)
+    
+    # Generate all legal moves and filter to only captures
+    all_moves = generate_legal_moves(board)
+    interesting_moves = [m for m in all_moves if is_capture(board, m)]
+    
+    # If no captures, position is quiet - return eval
+    if not interesting_moves:
+        return stand_pat
+    
+    for move in interesting_moves:
+        temp = board.copy()
+        temp.make_move(move)
+        
+        # Recursive quiescence call
+        score = -quiescence(temp, -beta, -alpha, ply + 1)
+        
+        if score >= beta:
+            return beta
+        
+        alpha = max(alpha, score)
+    
+    return alpha
 
 
 def negamax(board, depth, alpha, beta, color=1, tt_move=None, ply=0):
@@ -70,9 +129,9 @@ def negamax(board, depth, alpha, beta, color=1, tt_move=None, ply=0):
             if alpha >= beta:
                 return entry_score, entry.get('move')
     
-    # Base case: depth 0 or game over
+    # Base case: depth 0: use quiescence search instead of direct eval
     if depth == 0:
-        return evaluate_from_perspective(board), None
+        return quiescence(board, alpha, beta, ply), None
 
     moves = generate_legal_moves(board)
     if not moves:
@@ -182,6 +241,7 @@ def find_best_move(board, depth, time_limit):
 
 def print_search_stats(): # pragma: no cover
     print(f"Nodes searched: {search_stats['nodes_searched']}")
+    print(f"Quiescence nodes: {search_stats['quiescence_nodes']}")
     print(f"TT hits: {search_stats['tt_hits']} ({100*search_stats['tt_hits']/search_stats['nodes_searched']:.1f}%)")
     print(f"TT stores: {search_stats['tt_stores']}")
     print(f"Beta cutoffs: {search_stats['beta_cutoffs']}")
