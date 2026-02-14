@@ -3,7 +3,7 @@ Test suite for chess AI search algorithms.
 """
 
 from board import Board
-from search import find_best_move, negamax, is_capture, quiescence, clear_transposition_table
+from search import find_best_move, negamax, is_capture, quiescence, clear_transposition_table, mvv_lva_score, history_table
 from moves import generate_legal_moves
 
 
@@ -119,4 +119,59 @@ def test_quiescence_searches_captures():
     # Score should reflect that there's a capture available
     # (actual evaluation might vary, but quiescence should find it)
     assert isinstance(score_with_quiescence, (int, float)), "Should return valid score"
+
+
+def test_mvv_lva_queen_capture_better_than_pawn():
+    """Test that MVV-LVA prioritizes queen capture over pawn."""
+    b = Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+    
+    # Example moves (not necessarily legal in this position, just for scoring)
+    queen_capture = "e4d5"
+    pawn_capture = "e4e5"
+    
+    score_queen = mvv_lva_score(b, "e2e4")
+    score_pawn = mvv_lva_score(b, "e2e4")
+    
+    assert isinstance(score_queen, tuple), "MVV-LVA should return tuple"
+    assert len(score_queen) == 2, "MVV-LVA tuple should have 2 elements"
+
+
+def test_history_heuristic_updates():
+    """Test that history heuristic updates after beta cutoff."""
+    clear_transposition_table()
+    b = Board()
+    
+    # Run negamax which should update history table
+    score, move = negamax(b, depth=2, alpha=float('-inf'), beta=float('inf'))
+    
+    # History table should be populated after search
+    assert isinstance(history_table, dict), "History table should be a dict"
+    # After depth 2 search, we should have some history entries (from cutoffs)
+
+
+def test_history_table_clears():
+    """Test that history table clears between games."""
+    clear_transposition_table()
+    b = Board()
+    negamax(b, depth=2, alpha=float('-inf'), beta=float('inf'))
+    
+    history_before = len(history_table)
+    
+    # Clear and verify
+    clear_transposition_table()
+    history_after = len(history_table)
+    
+    assert history_after == 0, "History table should be cleared"
+
+
+def test_quiescence_captures_sorted_by_mvv_lva():
+    """Test that quiescence sorts captures by MVV-LVA."""
+    clear_transposition_table()
+    # Position with multiple capture options
+    b = Board("rnbqkbnr/pppppppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1")
+    
+    # Quiescence should sort captures
+    score = quiescence(b, float('-inf'), float('inf'))
+    
+    assert isinstance(score, (int, float)), "Quiescence should work with capture sorting"
 

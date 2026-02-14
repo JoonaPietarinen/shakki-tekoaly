@@ -2,6 +2,7 @@
 Chess AI search algorithms.
 Negamax with alpha-beta pruning and transposition table.
 Includes quiescence search to avoid horizon effect.
+Includes move ordering: history heuristic and MVV-LVA for captures.
 """
 
 from evaluation import evaluate_from_perspective
@@ -29,11 +30,21 @@ transposition_table = {}
 MAX_DEPTH = 100
 killer_moves = [[None, None] for _ in range(MAX_DEPTH)]
 
+# History heuristic: tracks good moves by source-destination
+history_table = {}
+
+# Piece values for MVV-LVA (Most Valuable Victim - Least Valuable Attacker)
+PIECE_VALUES = {
+    'p': 1, 'n': 3, 'b': 3, 'r': 5, 'q': 9, 'k': 100,
+    'P': 1, 'N': 3, 'B': 3, 'R': 5, 'Q': 9, 'K': 100
+}
+
 def clear_transposition_table():
-    """Clear the transposition table between games."""
-    global transposition_table, killer_moves
+    """Clear the transposition table and history heuristic between games."""
+    global transposition_table, killer_moves, history_table
     transposition_table = {}
     killer_moves = [[None, None] for _ in range(MAX_DEPTH)]
+    history_table = {}
 
 
 def is_capture(board, move: str) -> bool:
@@ -41,6 +52,27 @@ def is_capture(board, move: str) -> bool:
     to_sq = move[2:4]
     tr, tc = coord_to_sq(to_sq)
     return board.grid[tr][tc] != '.'
+
+
+def mvv_lva_score(board, move: str) -> tuple:
+    """
+    Most Valuable Victim - Least Valuable Attacker.
+    Returns (victim_value, -attacker_value) for sorting captures.
+    Higher values are better (captures valuable pieces with cheap pieces).
+    """
+    from_sq = move[:2]
+    to_sq = move[2:4]
+    fr, fc = coord_to_sq(from_sq)
+    tr, tc = coord_to_sq(to_sq)
+    
+    victim = board.grid[tr][tc]
+    attacker = board.grid[fr][fc]
+    
+    victim_value = PIECE_VALUES.get(victim, 0)
+    attacker_value = PIECE_VALUES.get(attacker, 0)
+    
+    # Return tuple: higher victim value first, then lower attacker value
+    return (victim_value, -attacker_value)
 
 
 def quiescence(board, alpha, beta, ply=0):
@@ -73,6 +105,9 @@ def quiescence(board, alpha, beta, ply=0):
     all_moves = generate_legal_moves(board)
     interesting_moves = [m for m in all_moves if is_capture(board, m)]
     
+    # Sort captures by MVV-LVA (Most Valuable Victim first)
+    interesting_moves.sort(key=lambda m: mvv_lva_score(board, m), reverse=True)
+    
     # If no captures, position is quiet - return eval
     if not interesting_moves:
         return stand_pat
@@ -95,6 +130,7 @@ def quiescence(board, alpha, beta, ply=0):
 def negamax(board, depth, alpha, beta, color=1, tt_move=None, ply=0):
     """
     Negamax search with alpha-beta pruning and transposition table.
+    Uses history heuristic and killer moves for move ordering.
     
     Args:
         board: Current board state
@@ -138,7 +174,7 @@ def negamax(board, depth, alpha, beta, color=1, tt_move=None, ply=0):
         # Checkmate or stalemate
         return -100000, None
     
-    # Move ordering: TT move first, then killer moves, then rest
+    # Move ordering: TT move first, then killer moves, then history heuristic
     ordered_moves = []
     
     # 1. TT move (best move from previous search)
@@ -153,8 +189,11 @@ def negamax(board, depth, alpha, beta, color=1, tt_move=None, ply=0):
                 ordered_moves.append(killer)
                 moves.remove(killer)
     
-    # 3. Remaining moves
-    ordered_moves.extend(moves)
+    # 3. Remaining moves sorted by history heuristic
+    # Higher history score = more likely to cause cutoffs
+    remaining_with_history = [(m, history_table.get(m[:4], 0)) for m in moves]
+    remaining_with_history.sort(key=lambda x: x[1], reverse=True)
+    ordered_moves.extend([m for m, _ in remaining_with_history])
 
     best_move = None
     best_score = float('-inf')
@@ -174,25 +213,28 @@ def negamax(board, depth, alpha, beta, color=1, tt_move=None, ply=0):
         # Alpha-beta pruning
         alpha = max(alpha, score)
         if alpha >= beta:
-            # Beta cutoff. store as killer move
+            # Beta cutoff: update history heuristic and killer moves
             search_stats['beta_cutoffs'] += 1
             
-            # Update killer moves (only for quiet moves, not captures)
-            # Simple heuristic: if move doesn't change material, it's likely quiet
+            # Update history heuristic (quiet moves that cause cutoffs)
+            if not is_capture(board, move):
+                move_key = move[:4]
+                history_table[move_key] = history_table.get(move_key, 0) + depth * depth
+            
+            # Update killer moves
             if ply < MAX_DEPTH:
-                # Store this move as killer, shifting previous killer
                 if killer_moves[ply][0] != move:
                     killer_moves[ply][1] = killer_moves[ply][0]
                     killer_moves[ply][0] = move
             
             break
+    
     if alpha >= beta:
         flag = LOWER
     elif best_score > alpha_orig:
         flag = EXACT
     else:
         flag = UPPER
-    
     
     # Store in transposition table
     transposition_table[board_hash] = {
@@ -207,7 +249,6 @@ def negamax(board, depth, alpha, beta, color=1, tt_move=None, ply=0):
 def find_best_move(board, depth, time_limit):
     """
     Find the best move using iterative deepening with negamax search and transposition table.
-    Instead of soft or hard time limits, we use smart time management to decide when to stop deepening.
     """
     global search_stats
     best_move = None
@@ -245,5 +286,6 @@ def print_search_stats(): # pragma: no cover
     print(f"TT hits: {search_stats['tt_hits']} ({100*search_stats['tt_hits']/search_stats['nodes_searched']:.1f}%)")
     print(f"TT stores: {search_stats['tt_stores']}")
     print(f"Beta cutoffs: {search_stats['beta_cutoffs']}")
+    print(f"History entries: {len(history_table)}")
     if search_stats.get('reached_depth', 0) > 0:
         print(f"Reached depth: {search_stats['reached_depth']}")
