@@ -10,7 +10,7 @@ CI-pipeline ajaa pytestit `src/tests` kansiosta.
 - AI haku algoritmi (src/tests/test_search.py)
 - Transpositiotaulut (src/tests/test_transposition.py)
 
-**Testien lukumäärä:** 23 testiä yhteensä
+**Testien lukumäärä:** 34 testiä yhteensä
 
 ---
 
@@ -58,6 +58,17 @@ CI-pipeline ajaa pytestit `src/tests` kansiosta.
 | test_negamax_finds_move | negamax(depth=2) | Palauttaa laillisen siirron | Pass |
 | test_find_best_move_returns_valid | find_best_move(depth=2) | Palauttaa laillisen siirron | Pass |
 | test_ai_prefers_captures | Board() + depth=2 | Ei kaadu, palauttaa siirron | Pass |
+| test_is_capture_detects_capture | Board("...e4d5..."), move="e4d5" | Palauttaa True | Pass |
+| test_is_capture_detects_non_capture | Board(), move="e2e4" | Palauttaa False | Pass |
+| test_is_capture_en_passant | Board en passant pos, move="e5d6" | Palauttaa False (ei capture) | Pass |
+| test_quiescence_with_no_captures | Board() (alkuasema) | Palauttaa stand pat evaluaation | Pass |
+| test_quiescence_with_captures | Board e4d5 pos | Tutkii sieppaukset | Pass |
+| test_quiescence_stand_pat | Board() | Stand pat >= beta | Pass |
+| test_quiescence_searches_captures | Board e4d5 pos | Captures tutkitaan | Pass |
+| test_mvv_lva_queen_capture_better_than_pawn | MVV-LVA scoring | Palauttaa tuple (value, -attacker) | Pass |
+| test_history_heuristic_updates | negamax(depth=2) | History table päivittyy | Pass |
+| test_history_table_clears | clear_transposition_table() | History table tyhjä | Pass |
+| test_quiescence_captures_sorted_by_mvv_lva | Board captures | Captures sorted oikein | Pass |
 
 ---
 
@@ -98,7 +109,7 @@ Käytetty: src/profile.py
 python src/profile.py
 ```
 
-**Tulokset:**
+**Tulokset (Esimerkki, uudempaa tietoa saa `Toteutusrapostti.md`):**
 
 | Depth | Nodes Searched | TT Hits | TT Stores | Beta Cutoffs | Best Move |
 |-------|----------------|---------|-----------|-----------|-----------|
@@ -213,9 +224,8 @@ Shakin tarkistus
 
 ## Johtopäätökset
 
-- **23 yksikkötestiä** kattaa ydin ominaisuudet
-- **Kaikki testit menevät läpi**
-- **Profilointi osoittaa** algoritmin tehokkuuden
+- **34 yksikkötestiä** kattaa ydin ominaisuudet ja viikon 5 optimoinnit
+- **Kaikki testit menevät läpi** ✅
+- **Profilointi osoittaa** algoritmin tehokkuuden ja viikon 5 parannukset
 - **Deterministiset testit** toistettavissa milloin tahansa
 - **Empiriiset tulokset** validoivat teoreettisen analyysin
-
