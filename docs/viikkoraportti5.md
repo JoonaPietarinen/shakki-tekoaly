@@ -2,6 +2,7 @@
 **Mitä olen tehnyt tällä viikolla?** 
 
 Vertaisarvioin minulle määrätyn työn. Lisäsin quiescence search algoritmi välttämään "horizon effect" ongelmaa sekä history heuristic ja MVV-LVA (Most Valuable Victim - Least Valuable Attacker) parantamaan move orderingia.
+Päivitin toeutus- sekä testausdokumentit ajantasalle.
 
 **Miten ohjelma on edistynyt?**
 
