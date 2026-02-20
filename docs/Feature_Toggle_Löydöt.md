@@ -40,9 +40,9 @@ Quiescence only:                       16,103 nodes | 3.714s | 0.93x nodes MUTTA
 ```
 
 **Yksityiskohdat:**
-- Nodes: 16,103 (-7% vs. baseline, odotettiin -20-40%!)
+- Nodes: 16,103 (-7% vs. baseline, odotettiin -20-40%)
 - Time: 3.714s (+292% vs. baseline)
-- Quiescence nodes: 16,779 (76% kaikista nodeista!)
+- Quiescence nodes: 16,779 (76% kaikista nodeista)
 - TT hits: 160 (1.0%)
 - Beta cutoffs: 1,902
 
@@ -51,9 +51,9 @@ Quiescence only:                       16,103 nodes | 3.714s | 0.93x nodes MUTTA
 2. Quiescence nodes = 76% solmuista. Ei ole "nopeampi" evaluatio vaan syvä haku
 3. Ilman killer movesia/historiaa, siirtojärjestys on huono
 4. Quiescence menee syvälle, koska siirrot eivät ole priorisoituja
-5. Tulos: **Paljon hitaampi kuin baseline!**
+5. Tulos: **Paljon hitaampi kuin baseline**
 
-**Johtopäätös:** Quiescence VAATII hyvää move orderingia!
+**Johtopäätös:** Quiescence VAATII hyvää move orderingia
 
 ---
 
@@ -76,15 +76,15 @@ Quiescence + Killer Moves:              4,088 nodes | 0.759s | 4.25x
 **Parannus Quiescence-yksin nähden:**
 - Nodes: 16,103 → 4,088 (-75%)
 - Time: 3.714s → 0.759s (-79%)
-- **Speedup: 4.9x parempi!**
+- **Speedup: 4.9x parempi**
 
 **Miksi se toimii:**
 1. Killer moves parantaa move orderingia
 2. Quiescence menee oikeisiin siirtoihin nopeasti
 3. Enemmän beta cutoffeja (766 vs. 1,902)
-4. Nopeampi kuin baseline!
+4. Nopeampi kuin baseline
 
-**Johtopäätös:** Killer moves on KRIITTINEN quiescencelle!
+**Johtopäätös:** Killer moves on KRIITTINEN quiescencelle
 
 ---
 
