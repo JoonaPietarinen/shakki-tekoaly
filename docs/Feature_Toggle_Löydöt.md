@@ -24,7 +24,7 @@ Profiling-testauksen avulla mitattiin eri optimointien vaikutus shakin AI hakual
 
 ### Parametrit
 
-- **Depth:** 6 (iteratiivisen deepeningin loppupuolella)
+- **Depth:** 6 (iteratiivisen syvenemisen loppupuolella)
 - **Board:** Starting position
 - **Mittaukset:** Nodes, Time, TT Hits, Beta Cutoffs, History entries
 
