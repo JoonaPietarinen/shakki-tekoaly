@@ -10,6 +10,12 @@ from moves import generate_legal_moves
 from board import coord_to_sq
 import time
 
+# Feature flags for optimization testing
+ENABLE_QUIESCENCE = True
+ENABLE_NULL_WINDOW = False
+ENABLE_HISTORY_HEURISTIC = True
+ENABLE_KILLER_MOVES = True
+
 search_stats = {
     'nodes_searched': 0,
     'tt_hits': 0,
@@ -131,6 +137,7 @@ def negamax(board, depth, alpha, beta, color=1, tt_move=None, ply=0):
     """
     Negamax search with alpha-beta pruning and transposition table.
     Uses history heuristic and killer moves for move ordering.
+    Feature flags allow selective optimization testing.
     
     Args:
         board: Current board state
@@ -165,9 +172,12 @@ def negamax(board, depth, alpha, beta, color=1, tt_move=None, ply=0):
             if alpha >= beta:
                 return entry_score, entry.get('move')
     
-    # Base case: depth 0: use quiescence search instead of direct eval
+    # Base case: depth 0
     if depth == 0:
-        return quiescence(board, alpha, beta, ply), None
+        if ENABLE_QUIESCENCE:
+            return quiescence(board, alpha, beta, ply), None
+        else:
+            return evaluate_from_perspective(board), None
 
     moves = generate_legal_moves(board)
     if not moves:
@@ -183,17 +193,19 @@ def negamax(board, depth, alpha, beta, color=1, tt_move=None, ply=0):
         moves.remove(tt_move)
     
     # 2. Killer moves (good cutoff moves from same depth)
-    if ply < MAX_DEPTH:
+    if ENABLE_KILLER_MOVES and ply < MAX_DEPTH:
         for killer in killer_moves[ply]:
             if killer and killer in moves:
                 ordered_moves.append(killer)
                 moves.remove(killer)
     
     # 3. Remaining moves sorted by history heuristic
-    # Higher history score = more likely to cause cutoffs
-    remaining_with_history = [(m, history_table.get(m[:4], 0)) for m in moves]
-    remaining_with_history.sort(key=lambda x: x[1], reverse=True)
-    ordered_moves.extend([m for m, _ in remaining_with_history])
+    if ENABLE_HISTORY_HEURISTIC:
+        remaining_with_history = [(m, history_table.get(m[:4], 0)) for m in moves]
+        remaining_with_history.sort(key=lambda x: x[1], reverse=True)
+        ordered_moves.extend([m for m, _ in remaining_with_history])
+    else:
+        ordered_moves.extend(moves)
 
     best_move = None
     best_score = float('-inf')
@@ -217,12 +229,12 @@ def negamax(board, depth, alpha, beta, color=1, tt_move=None, ply=0):
             search_stats['beta_cutoffs'] += 1
             
             # Update history heuristic (quiet moves that cause cutoffs)
-            if not is_capture(board, move):
+            if ENABLE_HISTORY_HEURISTIC and not is_capture(board, move):
                 move_key = move[:4]
                 history_table[move_key] = history_table.get(move_key, 0) + depth * depth
             
             # Update killer moves
-            if ply < MAX_DEPTH:
+            if ENABLE_KILLER_MOVES and ply < MAX_DEPTH:
                 if killer_moves[ply][0] != move:
                     killer_moves[ply][1] = killer_moves[ply][0]
                     killer_moves[ply][0] = move

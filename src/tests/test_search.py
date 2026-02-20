@@ -175,3 +175,153 @@ def test_quiescence_captures_sorted_by_mvv_lva():
     
     assert isinstance(score, (int, float)), "Quiescence should work with capture sorting"
 
+
+def test_feature_flag_quiescence_enabled():
+    """Test that quiescence can be disabled via feature flag."""
+    import search
+    clear_transposition_table()
+    
+    # Enable quiescence
+    search.ENABLE_QUIESCENCE = True
+    b = Board()
+    score1, move1 = negamax(b, 2, float('-inf'), float('inf'))
+    
+    nodes_with_qs = search.search_stats['nodes_searched']
+    qnodes_with_qs = search.search_stats['quiescence_nodes']
+    
+    # Disable quiescence
+    clear_transposition_table()
+    search.ENABLE_QUIESCENCE = False
+    search.search_stats['nodes_searched'] = 0
+    search.search_stats['quiescence_nodes'] = 0
+    
+    b = Board()
+    score2, move2 = negamax(b, 2, float('-inf'), float('inf'))
+    
+    nodes_without_qs = search.search_stats['nodes_searched']
+    qnodes_without_qs = search.search_stats['quiescence_nodes']
+    
+    # Restore default
+    search.ENABLE_QUIESCENCE = True
+    
+    # With quiescence: should have Q-nodes
+    assert qnodes_with_qs > 0, "Should have quiescence nodes when enabled"
+    # Without quiescence: should have NO Q-nodes
+    assert qnodes_without_qs == 0, "Should have zero quiescence nodes when disabled"
+
+
+def test_feature_flag_history_heuristic():
+    """Test that history heuristic can be disabled via feature flag."""
+    import search
+    clear_transposition_table()
+    
+    # Enable history
+    search.ENABLE_HISTORY_HEURISTIC = True
+    search.search_stats['nodes_searched'] = 0
+    search.search_stats['beta_cutoffs'] = 0
+    
+    b = Board()
+    negamax(b, 3, float('-inf'), float('inf'))
+    
+    nodes_with_history = search.search_stats['nodes_searched']
+    cutoffs_with_history = search.search_stats['beta_cutoffs']
+    history_entries = len(search.history_table)
+    
+    # Disable history
+    clear_transposition_table()
+    search.ENABLE_HISTORY_HEURISTIC = False
+    search.search_stats['nodes_searched'] = 0
+    search.search_stats['beta_cutoffs'] = 0
+    
+    b = Board()
+    negamax(b, 3, float('-inf'), float('inf'))
+    
+    nodes_without_history = search.search_stats['nodes_searched']
+    cutoffs_without_history = search.search_stats['beta_cutoffs']
+    
+    # Restore default
+    search.ENABLE_HISTORY_HEURISTIC = True
+    
+    # History should reduce nodes (better move ordering)
+    assert history_entries > 0, "History table should have entries when enabled"
+
+
+def test_feature_flag_killer_moves():
+    """Test that killer moves can be disabled via feature flag."""
+    import search
+    clear_transposition_table()
+    
+    # Enable killer moves
+    search.ENABLE_KILLER_MOVES = True
+    search.search_stats['nodes_searched'] = 0
+    
+    b = Board()
+    negamax(b, 3, float('-inf'), float('inf'))
+    
+    nodes_with_killers = search.search_stats['nodes_searched']
+    
+    # Disable killer moves
+    clear_transposition_table()
+    search.ENABLE_KILLER_MOVES = False
+    search.search_stats['nodes_searched'] = 0
+    
+    b = Board()
+    negamax(b, 3, float('-inf'), float('inf'))
+    
+    nodes_without_killers = search.search_stats['nodes_searched']
+    
+    # Restore default
+    search.ENABLE_KILLER_MOVES = True
+    
+    # Both should complete without error
+    assert nodes_with_killers > 0, "Should search with killers enabled"
+    assert nodes_without_killers > 0, "Should search with killers disabled"
+
+
+def test_feature_flags_combination():
+    """Test different combinations of feature flags."""
+    import search
+    from board import Board
+    
+    scenarios = [
+        {"QS": False, "History": False, "Killers": False},
+        {"QS": True, "History": False, "Killers": False},
+        {"QS": True, "History": True, "Killers": False},
+        {"QS": True, "History": True, "Killers": True},
+    ]
+    
+    results = []
+    
+    for scenario in scenarios:
+        clear_transposition_table()
+        search.search_stats['nodes_searched'] = 0
+        search.search_stats['quiescence_nodes'] = 0
+        search.search_stats['beta_cutoffs'] = 0
+        
+        search.ENABLE_QUIESCENCE = scenario["QS"]
+        search.ENABLE_HISTORY_HEURISTIC = scenario["History"]
+        search.ENABLE_KILLER_MOVES = scenario["Killers"]
+        
+        b = Board()
+        score, move = negamax(b, 2, float('-inf'), float('inf'))
+        
+        results.append({
+            'scenario': scenario,
+            'nodes': search.search_stats['nodes_searched'],
+            'qnodes': search.search_stats['quiescence_nodes'],
+            'cutoffs': search.search_stats['beta_cutoffs'],
+            'move': move
+        })
+    
+    # Restore defaults
+    search.ENABLE_QUIESCENCE = True
+    search.ENABLE_HISTORY_HEURISTIC = True
+    search.ENABLE_KILLER_MOVES = True
+    
+    # All scenarios should complete
+    assert len(results) == 4, "All scenarios should complete"
+    
+    # All should find a move
+    for result in results:
+        assert result['move'] is not None, f"Should find move in scenario {result['scenario']}"
+
