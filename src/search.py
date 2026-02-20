@@ -12,7 +12,7 @@ import time
 
 # Feature flags for optimization testing
 ENABLE_QUIESCENCE = True
-ENABLE_NULL_WINDOW = False
+ENABLE_NULL_WINDOW = True
 ENABLE_HISTORY_HEURISTIC = True
 ENABLE_KILLER_MOVES = True
 
@@ -261,6 +261,7 @@ def negamax(board, depth, alpha, beta, color=1, tt_move=None, ply=0):
 def find_best_move(board, depth, time_limit):
     """
     Find the best move using iterative deepening with negamax search and transposition table.
+    Optionally uses null-window search for faster move evaluation.
     """
     global search_stats
     best_move = None
@@ -284,11 +285,30 @@ def find_best_move(board, depth, time_limit):
             if current_depth > 1 and elapsed > 0.4 * time_limit:
                 break
         
-        score, move = negamax(board, current_depth, float('-inf'), float('inf'), ply=0)
-        
-        if move:
-            best_move = move
-            best_score = score
+        # Try null-window search first if enabled
+        if ENABLE_NULL_WINDOW and best_score is not None:
+            # Null-window search: search with narrow window to quickly verify if move is good
+            null_score, move = negamax(board, current_depth, best_score, best_score + 1, ply=0)
+            
+            if null_score >= best_score + 1:
+                # Re-search with full window
+                score, move = negamax(board, current_depth, float('-inf'), float('inf'), ply=0)
+                if move:
+                    best_move = move
+                    best_score = score
+            else:
+                # Score is within expected range, use null-window result
+                score, move = null_score, move
+                if move:
+                    best_move = move
+                    best_score = null_score
+        else:
+            # No best_score yet or null-window disabled, do full search
+            score, move = negamax(board, current_depth, float('-inf'), float('inf'), ply=0)
+            
+            if move:
+                best_move = move
+                best_score = score
     
     return best_move
 
