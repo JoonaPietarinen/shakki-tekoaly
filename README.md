@@ -8,6 +8,8 @@
 
 [Testausdokumentti](docs/Testausdokumentti.md)
 
+[Käyttöohje](docs/Käyttöohje.md)
+
 ## Viikkoraportit
 
 [Viikko 1](docs/viikkoraportti1.md)
