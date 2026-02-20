@@ -7,14 +7,17 @@ Tekoälyä vastaan voi pelata [TIRA AI-platform alustalla](https://github.com/ga
 ### Asennus ja Käyttö
 
 1. **Kloonaa repositorio:**
-1. `git clone https://github.com/JoonaPietarinen/shakki-tekoaly cd shakki-tekoaly`
+   
+ `git clone https://github.com/JoonaPietarinen/shakki-tekoaly cd shakki-tekoaly`
 
 
 2. **Käynnistä AI-platform:**
-1. Seuraa AI-platformin [ohjeita](https://algolabra-hy.github.io/aiplatform-fi#:~:text=Minimaaliset%20ohjeet%20k%C3%A4ytt%C3%B6%C3%B6nottoon)
+   
+ Seuraa AI-platformin [ohjeita](https://algolabra-hy.github.io/aiplatform-fi#:~:text=Minimaaliset%20ohjeet%20k%C3%A4ytt%C3%B6%C3%B6nottoon)
 
 
 3. **Pelaa:**
+   
 - Valitse peliksi shakki ja tekoäly vastustajaksesi
 - Tee siirtoja shakkilaudalla
 - Tekoäly vastaa omalla siirrolla
