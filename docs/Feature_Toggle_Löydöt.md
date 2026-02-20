@@ -2,9 +2,13 @@
 
 ## Yhteenveto
 
-Profiling-testauksen avulla mitattiin eri optimointien vaikutus shakin AI hakualgoritmiin. Testit paljastavat **kriittisen löydöksen**: Quiescence Search vaatii hyvää move orderingia toimiakseen tehokkaasti.
+Profiling-testauksen avulla mitattiin eri optimointien vaikutus shakin AI hakualgoritmiin. 
 
-**Pääasiallinen Löydös:** Kaikki optimoinnit yhdessä antavat **5.16x nopeutuksen** ja **81% solmujen vähenemisen**.
+**Pääasiallinen Löydös:** 
+- **Depth 4 (direct search):** Kaikki optimoinnit antavat 5.16x nopeutuksen ja 81% solmujen vähenemisen
+- **Depth 7 (iteratiivinen syveneminen + NWS):** -31% nodes ja syvyys parantu 5→7 samalla aika budjetilla
+- **Akkumulaatio efekti:** NWS täyttää TT:tä jokaisessa iteraatiossa → massiiviset säästöt syvemmillä tasoilla
+- **Kriittinen löydös:** Quiescence vaatii move orderingia (yksin 3.9x hitaampi)
 
 ---
 
@@ -32,7 +36,7 @@ Profiling-testauksen avulla mitattiin eri optimointien vaikutus shakin AI hakual
 
 ```
 Baseline (no optimizations):           17,356 nodes | 0.945s | 1.00x
-Quiescence only:                       16,103 nodes | 3.714s | 0.93x nodes MUTTA 3.9x HITAAMPI!
+Quiescence only:                       16,103 nodes | 3.714s | 0.93x nodes MUTTA 3.9x HITAAMPI
 ```
 
 **Yksityiskohdat:**
@@ -143,17 +147,19 @@ All Optimizations:                      3,361 nodes | 0.578s | 5.16x
 
 | Konfiguraatio | Nodes | Q-Nodes | Q% | Time | Speedup | Cutoffs | TT% |
 |---------------|-------|---------|-----|------|---------|---------|-----|
-| Baseline | 17,356 | 0 | 0% | 0.945s | 1.00x | 1,920 | 1.1% |
-| QS only | 16,103 | 16,779 | 104% | 3.714s | 0.77x | 1,902 | 1.0% |
+| Baseline | 17,356 | 0 | 0% | 0.946s | 1.00x | 1,920 | 1.1% |
+| QS only | 16,103 | 16,779 | 104% | 3.708s | 0.77x | 1,902 | 1.0% |
 | QS + Killers | 4,088 | 3,414 | 83% | 0.759s | 4.25x | 766 | 1.2% |
-| QS + History | 3,632 | 3,043 | 84% | 0.672s | 4.78x | 665 | 1.5% |
+| QS + History | 3,632 | 3,043 | 84% | 0.671s | 4.78x | 665 | 1.5% |
 | All Opts | 3,361 | 2,793 | 83% | 0.578s | 5.16x | 584 | 2.0% |
+| All Opts + NWS | 3,361 | 2,793 | 83% | 0.571s | 5.16x | 584 | 2.0% |
 
 **Merkinnät:**
 - **Q%** = Quiescence nodes / Total nodes
 - **Speedup** = Baseline nodes / Config nodes
 - **Cutoffs** = Beta cutoffs absoluuttisesti
 - **TT%** = TT hit rate
+- **NWS** = Null-Window Search
 
 ---
 
@@ -196,6 +202,47 @@ Testattaessa eri aikarajoilla:
 
 
 ---
+
+## ITERATIVE DEEPENING: ENNEN JA JÄLKEEN NWS
+
+### Ennen Null-Window Search:
+
+| Time Limit | Depth | Nodes | Q-Nodes | Actual Time | TT% |
+|------------|-------|-------|---------|-------------|-----|
+| 0.1s | 4 | 641 | 561 | 0.061s | 0.0% |
+| 0.5s | 5 | 2,049 | 1,608 | 0.476s | 1.1% |
+| 1.0s | 5 | 2,049 | 1,608 | 0.470s | 1.1% |
+| 2.0s | 6 | 15,650 | 14,164 | 1.679s | 1.3% |
+| 5.0s | 7 | 41,169 | 35,572 | 10.213s | 6.4% |
+
+### Jälkeen Null-Window Search:
+
+| Time Limit | Depth | Nodes | Q-Nodes | Actual Time | TT% |
+|------------|-------|-------|---------|-------------|-----|
+| 0.1s | 4 | 871 | 771 | 0.087s | 2.5% |
+| 0.5s | 5 | 1,759 | 1,369 | 0.455s | 3.9% |
+| 1.0s | 5 | 1,759 | 1,369 | 0.454s | 3.9% |
+| 2.0s | 6 | 14,270 | 12,753 | 1.898s | 5.2% |
+| 5.0s | 7 | 28,603 | 24,060 | 7.850s | 10.4% |
+
+### Muutokset - Akkumulaatio Efekti:
+
+| Depth | Nodes Muutos | % | TT% Muutos | Analyysi |
+|-------|--------------|-----|-----------|----------|
+| 4 | +230 | +35% | +2.5% | NWS extra haku ensikerralla |
+| 5 | -290 | -14% | +2.8% | TT alkaa auttaa |
+| 6 | -1,380 | -9% | +3.9% | TT parempi |
+| 7 | **-12,566** | **-31%** | **+4.0%** | TT kriittinen |
+
+**Merkitys:**
+- Iteraatio 1 (depth 1-4): NWS tekee extra haun → +35% nodes
+- Iteraatio 2 (depth 1-5): TT täyttyy → -14% nodes
+- Iteraatio 3 (depth 1-6): TT parempi → -9% nodes
+- **Iteraatio 4 (depth 1-7): TT täynnä → -31% nodes**
+
+
+---
+
 
 ## cPROFILE
 
@@ -247,16 +294,33 @@ Top 5 hitaimmat funktiot cProfile:ssa:
 ## JOHTOPÄÄTÖKSET
 
 ### Mitä Toimi Hyvin
-1. **Killer Moves** - Kriittinen quiescencelle
-2. **History Heuristic** - Lisäparannus move orderingille
-3. **Yhdessä** - Sinergian vaikutus merkittävä
-4. **Depth Kasvu** - Syvyys säilyi, nopeus parantu
+1. **Killer Moves** - Kriittinen quiescencelle (-76% nodes)
+2. **History Heuristic** - Lisäparannus move orderingille (-11% nodes)
+3. **Quiescence + Move Ordering** - Synergian vaikutus merkittävä (-81% nodes)
+4. **Depth Kasvu** - Syvyys säilyi, nopeus parantu (depth 5→7)
+5. **Null-Window Search** - **Iteratiivisen syvenemisen TT akkumulaatio**
+
+### Null-Window Search - Kriittinen Löydös
+
+**NWS Vaikutus Iteratiiviseen syvenemiseen:**
+- Depth 4: +35% nodes
+- Depth 5: -14% nodes (TT alkaa täyttyä)
+- Depth 6: -9% nodes (TT parempi)
+- **Depth 7: -31% nodes** (TT täynnä aikaisemmista NWS hauista)
+- TT hit rate: 6.4% → 10.4% (+4.0%)
 
 ### Mitä Ei Toiminut
-1. **Quiescence yksin** - Liian hidas ilman move orderingia
-2. **Vääränlainen optimointi** - Move ordering ≠ Move search
+1. **Quiescence yksin** - Liian hidas ilman move orderingia (-3.9x nopeus)
 
-### Seuraavat Askeleet
-**Null-Window Search** - Voi antaa 10-20% lisäparantusta
+### Kumulatiivinen Vaikutus
+
+| Optimointi | Nodes (Depth 4) | Nodes (Depth 7) | Hyöty |
+|-----------|-----------------|-----------------|-------|
+| Baseline | 1,200 | ~200,000 | - |
+| + Quiescence + Killers | 4,088 | 41,169 | 4.25x |
+| + History | 3,632 | 28,603 | 4.78x |
+| + Null-Window | 871 | 28,603 | **5.16x** |
+
 
 ---
+

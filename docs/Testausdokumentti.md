@@ -10,7 +10,7 @@ CI-pipeline ajaa pytestit `src/tests` kansiosta.
 - AI haku algoritmi (src/tests/test_search.py)
 - Transpositiotaulut (src/tests/test_transposition.py)
 
-**Testien lukumäärä:** 34 testiä yhteensä
+**Testien lukumäärä:** 41 testiä yhteensä
 
 ---
 
@@ -69,6 +69,13 @@ CI-pipeline ajaa pytestit `src/tests` kansiosta.
 | test_history_heuristic_updates | negamax(depth=2) | History table päivittyy | Pass |
 | test_history_table_clears | clear_transposition_table() | History table tyhjä | Pass |
 | test_quiescence_captures_sorted_by_mvv_lva | Board captures | Captures sorted oikein | Pass |
+| test_feature_flag_quiescence_enabled | ENABLE_QUIESCENCE: True/False | Q-nodes tallennetaan vain jos QS enabled | Pass |
+| test_feature_flag_history_heuristic | ENABLE_HISTORY_HEURISTIC: True/False | Historia pitäisi tallentua vain jos se on päällä | Pass |
+| test_feature_flag_killer_moves | ENABLE_KILLER_MOVES: True/False | Haun pitäisi toimia myös ilman killer movesia | Pass |
+| test_feature_flags_combination | 4 feature flag kombinaatiota (QS on/off, History on/off, Killers on/off) | Haun pitäisi onnistua kaikissa feature flag tapauksissa | Pass |
+| test_null_window_search_enabled | ENABLE_NULL_WINDOW: True/False, depth=2 | Haun pitäisi onnistua NWS:stä riippumatta | Pass |
+| test_window_search_narrower_window | ENABLE_NULL_WINDOW: True, depth=3, all flags enabled | Löytää hyvän avaus siirron | Pass |
+| test_null_window_with_all_optimizations | ENABLE_NULL_WINDOW: True/False, depth=4, all optimizations | Haun pitäisi onnistua NWS+kaikki optimpoinnit yhdistelmällä | Pass |
 
 ---
 
@@ -219,13 +226,17 @@ Alpha-beta karsinta
 Mattien tunnistaminen  
 Iteratiivinen syventäminen  
 Shakin tarkistus  
+Quiescence search
+Historiaheuristiikka
+Killer moves
+Null window search
 
 ---
 
 ## Johtopäätökset
 
-- **34 yksikkötestiä** kattaa ydin ominaisuudet ja viikon 5 optimoinnit
-- **Kaikki testit menevät läpi** ✅
-- **Profilointi osoittaa** algoritmin tehokkuuden ja viikon 5 parannukset
+- **41 yksikkötestiä** kattaa ydin ominaisuudet ja optimoinnit
+- **Kaikki testit menevät läpi**
+- **Profilointi osoittaa** algoritmin tehokkuuden ja optimointien vaikutukset
 - **Deterministiset testit** toistettavissa milloin tahansa
 - **Empiriiset tulokset** validoivat teoreettisen analyysin

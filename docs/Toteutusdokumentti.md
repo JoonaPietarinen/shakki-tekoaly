@@ -14,11 +14,14 @@ Kyseessä on shakkitekoäly, jota vastaan voi pelata [AI-platform alustalla](htt
 - Quiescence search
 - History heuristic (move ordering)
 - MVV-LVA (Most Valuable Victim - Least Valuable Aggressor) (move ordering)
+- Null-window search
 
 Shakin pelilogiikka on toteutettu `board.py` sekä `moves.py` tiedostoihin. `moves.py` keskittyy laillisten siirtojen generointiin, sekä shakkimatin että patin(stalemate) tunnistamiseen. `board.py` käsittelee kaiken muun pelilogiikan.
 # Aika- ja Tilavaativuusanalyysi
 
 ## Teoreettinen analyysi
+
+Uusimmat mittaukset on suoritettu viikolla 5 ennen Null-Window Search optimointia. NWS mittaukset löytyvät `docs\Feature_Toggle_Löydöt.md` tiedostosta, josta löytyy myös analyysi eri optimointien vaikutuksesta.
 
 ### Brute Force Negamax
 - **Kaava:** O(b^d)
