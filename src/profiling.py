@@ -23,30 +23,42 @@ def profile_optimization_combinations():
             "QS": False,
             "History": False,
             "Killers": False,
+            "NWS": False,
         },
         {
             "name": "Quiescence only",
             "QS": True,
             "History": False,
             "Killers": False,
+            "NWS": False,
         },
         {
             "name": "Quiescence + Killer Moves",
             "QS": True,
             "History": False,
             "Killers": True,
+            "NWS": False,
         },
         {
             "name": "Quiescence + History",
             "QS": True,
             "History": True,
             "Killers": False,
+            "NWS": False,
         },
         {
             "name": "All Optimizations (QS + History + Killers)",
             "QS": True,
             "History": True,
             "Killers": True,
+            "NWS": False,
+        },
+        {
+            "name": "All Optimizations + Null-Window Search",
+            "QS": True,
+            "History": True,
+            "Killers": True,
+            "NWS": True,
         },
     ]
     
@@ -63,6 +75,7 @@ def profile_optimization_combinations():
         search.ENABLE_QUIESCENCE = scenario["QS"]
         search.ENABLE_HISTORY_HEURISTIC = scenario["History"]
         search.ENABLE_KILLER_MOVES = scenario["Killers"]
+        search.ENABLE_NULL_WINDOW = scenario["NWS"]
         
         print(f"\n{scenario['name']}:")
         print("-" * 70)
@@ -90,6 +103,7 @@ def profile_optimization_combinations():
     search.ENABLE_QUIESCENCE = True
     search.ENABLE_HISTORY_HEURISTIC = True
     search.ENABLE_KILLER_MOVES = True
+    search.ENABLE_NULL_WINDOW = True
     
     # Print comparison table
     print("\n" + "="*70)
@@ -98,12 +112,12 @@ def profile_optimization_combinations():
     
     baseline = results[0]
     
-    print(f"\n{'Scenario':<45} {'Nodes':>10} {'Time':>8} {'Speedup':>8}")
+    print(f"\n{'Scenario':<50} {'Nodes':>10} {'Time':>8} {'Speedup':>8}")
     print("-" * 70)
     
     for result in results:
         speedup = baseline['nodes'] / result['nodes'] if result['nodes'] > 0 else 0
-        print(f"{result['scenario']:<45} {result['nodes']:>10} {result['time']:>7.3f}s {speedup:>7.2f}x")
+        print(f"{result['scenario']:<50} {result['nodes']:>10} {result['time']:>7.3f}s {speedup:>7.2f}x")
     
     print("\n" + "="*70)
     print("DETAILED METRICS")
