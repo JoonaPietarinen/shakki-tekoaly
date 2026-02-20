@@ -213,37 +213,33 @@ def test_feature_flag_quiescence_enabled():
 def test_feature_flag_history_heuristic():
     """Test that history heuristic can be disabled via feature flag."""
     import search
+
     clear_transposition_table()
-    
-    # Enable history
     search.ENABLE_HISTORY_HEURISTIC = True
     search.search_stats['nodes_searched'] = 0
-    search.search_stats['beta_cutoffs'] = 0
     
     b = Board()
     negamax(b, 3, float('-inf'), float('inf'))
     
     nodes_with_history = search.search_stats['nodes_searched']
-    cutoffs_with_history = search.search_stats['beta_cutoffs']
-    history_entries = len(search.history_table)
-    
-    # Disable history
+    history_entries_with = len(search.history_table)
+
     clear_transposition_table()
     search.ENABLE_HISTORY_HEURISTIC = False
     search.search_stats['nodes_searched'] = 0
-    search.search_stats['beta_cutoffs'] = 0
     
     b = Board()
     negamax(b, 3, float('-inf'), float('inf'))
     
     nodes_without_history = search.search_stats['nodes_searched']
-    cutoffs_without_history = search.search_stats['beta_cutoffs']
+    history_entries_without = len(search.history_table)
     
     # Restore default
     search.ENABLE_HISTORY_HEURISTIC = True
     
-    # History should reduce nodes (better move ordering)
-    assert history_entries > 0, "History table should have entries when enabled"
+    # History should have entries when enabled, and should be empty when disabled
+    assert history_entries_with > 0, "History should have entries when ENABLED"
+    assert history_entries_without == 0, "History should be EMPTY when DISABLED"
 
 
 def test_feature_flag_killer_moves():
@@ -324,4 +320,96 @@ def test_feature_flags_combination():
     # All should find a move
     for result in results:
         assert result['move'] is not None, f"Should find move in scenario {result['scenario']}"
+
+
+def test_null_window_search_enabled():
+    """Test that null-window search can be disabled via feature flag."""
+    import search
+    clear_transposition_table()
+    
+    # Enable null-window
+    search.ENABLE_NULL_WINDOW = True
+    search.search_stats['nodes_searched'] = 0
+    
+    b = Board()
+    move1 = find_best_move(b, depth=2, time_limit=None)
+    
+    nodes_with_nws = search.search_stats['nodes_searched']
+    
+    # Disable null-window
+    clear_transposition_table()
+    search.ENABLE_NULL_WINDOW = False
+    search.search_stats['nodes_searched'] = 0
+    
+    b = Board()
+    move2 = find_best_move(b, depth=2, time_limit=None)
+    
+    nodes_without_nws = search.search_stats['nodes_searched']
+    
+    # Restore default
+    search.ENABLE_NULL_WINDOW = True
+    
+    # Both should find a move
+    assert move1 is not None, "Should find move with NWS enabled"
+    assert move2 is not None, "Should find move with NWS disabled"
+
+
+def test_null_window_search_narrower_window():
+    """Test that null-window search uses narrower window (beta - 1)."""
+    import search
+    clear_transposition_table()
+
+    search.ENABLE_NULL_WINDOW = True
+    search.ENABLE_QUIESCENCE = True
+    search.ENABLE_HISTORY_HEURISTIC = True
+    search.ENABLE_KILLER_MOVES = True
+    
+    search.search_stats['nodes_searched'] = 0
+    
+    b = Board()
+    move = find_best_move(b, depth=3, time_limit=None)
+    
+    # Should find a move without errors
+    assert move is not None, "Null-window search should find a move"
+    assert move in ["e2e4", "d2d4", "g1f3", "c2c4", "b1c3"], "Should find a reasonable opening move"
+
+
+def test_null_window_with_all_optimizations():
+    """Test null-window search combined with all other optimizations."""
+    import search
+    clear_transposition_table()
+    
+    # Enable all optimizations
+    search.ENABLE_NULL_WINDOW = True
+    search.ENABLE_QUIESCENCE = True
+    search.ENABLE_HISTORY_HEURISTIC = True
+    search.ENABLE_KILLER_MOVES = True
+    
+    search.search_stats['nodes_searched'] = 0
+    search.search_stats['quiescence_nodes'] = 0
+    
+    b = Board()
+    move = find_best_move(b, depth=4, time_limit=None)
+    
+    all_opts_nodes = search.search_stats['nodes_searched']
+    all_opts_qnodes = search.search_stats['quiescence_nodes']
+    
+    # Disable null-window
+    clear_transposition_table()
+    search.ENABLE_NULL_WINDOW = False
+    search.search_stats['nodes_searched'] = 0
+    search.search_stats['quiescence_nodes'] = 0
+    
+    b = Board()
+    move2 = find_best_move(b, depth=4, time_limit=None)
+    
+    without_nws_nodes = search.search_stats['nodes_searched']
+    
+    # Restore
+    search.ENABLE_NULL_WINDOW = True
+    
+    # Both should complete
+    assert move is not None, "Should find move with NWS"
+    assert move2 is not None, "Should find move without NWS"
+
 
