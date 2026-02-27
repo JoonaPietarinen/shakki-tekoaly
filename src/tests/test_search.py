@@ -2,6 +2,8 @@
 Test suite for chess AI search algorithms.
 """
 
+import pytest
+import os
 from board import Board
 from search import find_best_move, negamax, is_capture, quiescence, clear_transposition_table, mvv_lva_score, history_table
 from moves import generate_legal_moves
@@ -432,15 +434,15 @@ def test_ai_time_limit():
     
     assert move is not None, "Should find a move within time limit"
 
+@pytest.mark.skipif(os.getenv('CI'),reason="Takes 34.81s in CI. Can be run locally")
 def test_ai_time_limit_prediction():
     """
     Test that AI's time prediction allows it to return a move before time limit
     Might need personal adjusting by tester
-    Github Actions minimum time is 34.81s.
     """
     import time
     b = Board()
-    max_time = 36 # If AI completes in say 10.1 seconds, increase to 11. Adjust until it reliably completes just under the time limit.
+    max_time = 10 # If AI completes in say 10.1 seconds, increase to 11. Adjust until it reliably completes just under the time limit.
     
     start_time = time.time()
     move = find_best_move(b, depth=10, time_limit=max_time)
