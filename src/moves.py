@@ -256,7 +256,7 @@ def is_stalemate(board):
     return False
 
 
-def is_draw_by_fifty_moves(board): # Pragma: no cover
+def is_draw_by_fifty_moves(board):
     """Check if draw by 50-move rule (100 half-moves)."""
     return board.halfmove >= 100
 
