@@ -2,10 +2,7 @@ from board import coord_to_sq, sq_to_coord
 
 def is_attacked(r: int, c: int, by_color: str, grid, board=None) -> bool:
     """Check if square (r, c) is attacked by side 'by_color'."""
-    
-    def in_bounds(r: int, c: int) -> bool:
-        return 0 <= r < 8 and 0 <= c < 8
-    
+
     # Pawn attacks
     pawn_dir = -1 if by_color == 'w' else 1
     for dc in (-1, 1):
