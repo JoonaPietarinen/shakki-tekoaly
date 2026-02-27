@@ -119,8 +119,7 @@ def evaluate(board):
                 else:  # White piece
                     index = r * 8 + c
                     bonus = table[index]
-            else:
-                bonus = 0
+
             
             # Add material + positional value
             if piece.isupper():  # White
