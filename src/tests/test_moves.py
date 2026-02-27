@@ -3,7 +3,7 @@ Test suite for chess engine core functionality.
 """
 
 from board import Board
-from moves import generate_legal_moves, is_checkmate, is_stalemate
+from moves import generate_legal_moves, is_checkmate, is_stalemate, is_draw_by_fifty_moves
 
 
 def test_start_position():
@@ -50,3 +50,38 @@ def test_stalemate():
     moves = generate_legal_moves(b)
     assert len(moves) == 0, "Should be stalemate"
     assert is_stalemate(b), "Should be True"    
+
+def test_50_move_rule_not_yet_draw():
+    """Test 50-move rule, not yet draw at 99."""
+    b = Board("8/8/8/8/8/8/8/K6k w - - 99 1")
+    assert not is_draw_by_fifty_moves(b), "Should not be draw yet at 99"
+
+def test_50_move_rule_is_draw_at_100():
+    """Test 50-move rule, is draw at exactly 100."""
+    b = Board("8/8/8/8/8/8/8/K6k w - - 100 1")
+    assert is_draw_by_fifty_moves(b), "Should be draw at 100"
+
+def test_50_move_rule_is_draw_over_100():
+    """Test 50-move rule, is draw at 101+."""
+    b = Board("8/8/8/8/8/8/8/K6k w - - 101 1")
+    assert is_draw_by_fifty_moves(b), "Should be draw at 101"
+
+def test_castling_black():
+    """Test castling for black pieces."""
+    b = Board("r3k2r/8/8/8/8/8/8/R3K2R b KQkq - 0 1")
+    moves = generate_legal_moves(b)
+    assert 'e8g8' in moves, "Missing black kingside castling"
+    assert 'e8c8' in moves, "Missing black queenside castling"
+
+def test_black_pawn_moves():
+    """Test black pawn move generation."""
+    b = Board("8/pp6/8/8/8/8/8/K6k b - - 0 1")
+    moves = generate_legal_moves(b)
+    assert 'a7a6' in moves or 'a7a5' in moves, "Missing black pawn moves"
+    assert 'b7b6' in moves or 'b7b5' in moves, "Missing black pawn moves"
+
+def test_knight_moves_black():
+    """Test black knight move generation."""
+    b = Board("8/8/8/8/8/8/8/K5nk b - - 0 1")
+    moves = generate_legal_moves(b)
+    assert len(moves) > 0, "Knight should have legal moves"

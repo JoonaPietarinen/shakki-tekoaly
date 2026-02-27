@@ -60,3 +60,18 @@ def test_to_fen_promotion():
     # Should have queen instead of pawn
     assert "Q" in fen.split()[0], "Promoted pawn should be queen"
     assert "P" not in fen.split()[0], "Original pawn should not exist"
+
+def test_start_fen():
+    """Test that starting FEN is correct."""
+    b = Board()
+    b.set_fen("startpos_fen")
+    assert b.to_fen() == "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", "Starting FEN should be correct"
+
+def test_attempt_to_move_non_existent_piece():
+    """Test that moving a piece from an empty square raises an error."""
+    b = Board()
+    try:
+        b.make_move("e3e4")  # No piece on e3
+        assert False, "Should have raised an error for moving from empty square"
+    except ValueError:
+        pass  # Expected

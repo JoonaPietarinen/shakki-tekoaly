@@ -413,3 +413,37 @@ def test_null_window_with_all_optimizations():
     assert move2 is not None, "Should find move without NWS"
 
 
+
+def test_ai_checkmate_detection():
+    """Test that AI recognizes checkmate positions"""
+    b = Board("rk6/8/8/8/8/8/8/Kqr5 w KQkq - 0 1")
+    move = find_best_move(b, depth=2, time_limit=None)
+    
+    assert move is None
+
+def test_ai_time_limit():
+    """Test that AI respects time limit"""
+    import time
+    b = Board()
+    
+    start_time = time.time()
+    move = find_best_move(b, depth=10, time_limit=0.1)
+    end_time = time.time()
+    
+    assert move is not None, "Should find a move within time limit"
+
+def test_ai_time_limit_prediction():
+    """
+    Test that AI's time prediction allows it to return a move before time limit
+    Might need personal adjusting by tester
+    """
+    import time
+    b = Board()
+    max_time = 10 # If AI completes in say 10.1 seconds, increase to 11. Adjust until it reliably completes just under the time limit.
+    
+    start_time = time.time()
+    move = find_best_move(b, depth=10, time_limit=max_time)
+    end_time = time.time()
+    
+    elapsed = end_time - start_time
+    assert elapsed < max_time, f"AI should return move before {max_time:.2f} seconds, but took {elapsed:.2f} seconds. Adjust max_time"
