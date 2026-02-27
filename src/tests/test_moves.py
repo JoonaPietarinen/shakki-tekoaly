@@ -87,8 +87,35 @@ def test_black_pawn_moves():
     assert 'a7a6' in moves or 'a7a5' in moves, "Missing black pawn moves"
     assert 'b7b6' in moves or 'b7b5' in moves, "Missing black pawn moves"
 
-def test_knight_moves_black():
+def test_black_knight_moves():
     """Test black knight move generation."""
     b = Board("8/8/8/8/8/8/8/K5nk b - - 0 1")
     moves = generate_legal_moves(b)
     assert len(moves) > 0, "Knight should have legal moves"
+
+def test_pawn_attacks_white():
+    """Test that pawn attacks are detected correctly for white pawns."""
+    from moves import is_attacked
+    b = Board("8/8/8/8/4P3/8/8/K6k w - - 0 1")
+
+    grid = b.grid
+    assert is_attacked(3, 3, 'w', grid), "d5 should be attacked by white pawn on e4"
+    assert is_attacked(3, 5, 'w', grid), "f5 should be attacked by white pawn on e4"
+
+def test_pawn_attacks_black():
+    """Test that pawn attacks are detected correctly for black pawns."""
+    from moves import is_attacked
+    b = Board("8/8/8/4p3/8/8/8/K6k b - - 0 1")
+
+    grid = b.grid
+    assert is_attacked(4, 3, 'b', grid), "d4 should be attacked by black pawn on e5"
+    assert is_attacked(4, 5, 'b', grid), "f4 should be attacked by black pawn on e5"
+  
+def test_black_king_attacks():
+    """Test that king attacks are detected correctly for black king."""
+    from moves import is_attacked
+    b = Board("8/8/8/8/4k3/8/8/1K6 b - - 0 1")
+    
+    grid = b.grid
+    assert is_attacked(3, 3, 'b', grid), "d5 should be attacked by black king"
+    assert is_attacked(5, 5, 'b', grid), "f3 should be attacked by black king"
