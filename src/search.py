@@ -282,7 +282,7 @@ def find_best_move(board, depth, time_limit):
             # Predict if we have enough time for next iteration
             # Next depth typically takes ~3-5x longer than previous
             # Don't start if we've used more than 40% of time budget
-            if current_depth > 1 and elapsed > 0.4 * time_limit: # Pragma: no cover
+            if current_depth > 1 and elapsed > 0.4 * time_limit: # pragma: no cover
                 break
         
         # Try null-window search first if enabled
