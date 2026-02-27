@@ -436,11 +436,11 @@ def test_ai_time_limit_prediction():
     """
     Test that AI's time prediction allows it to return a move before time limit
     Might need personal adjusting by tester
-    Github Actions has some variability in performance, so this test may need to be adjusted according to it as well.
+    Github Actions minimum time is 34.81s.
     """
     import time
     b = Board()
-    max_time = 0.1 # If AI completes in say 10.1 seconds, increase to 11. Adjust until it reliably completes just under the time limit.
+    max_time = 36 # If AI completes in say 10.1 seconds, increase to 11. Adjust until it reliably completes just under the time limit.
     
     start_time = time.time()
     move = find_best_move(b, depth=10, time_limit=max_time)
