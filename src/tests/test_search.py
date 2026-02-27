@@ -434,7 +434,7 @@ def test_ai_time_limit():
     
     assert move is not None, "Should find a move within time limit"
 
-@pytest.mark.skipif(os.getenv('CI'),reason="Takes 34.81s in CI. Can be run locally")
+@pytest.mark.skipif(os.getenv('CI') is not None, reason="Takes 34.81s in CI. Can be run locally")
 def test_ai_time_limit_prediction():
     """
     Test that AI's time prediction allows it to return a move before time limit
