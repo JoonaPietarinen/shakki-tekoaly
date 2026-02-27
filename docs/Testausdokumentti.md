@@ -10,7 +10,8 @@ CI-pipeline ajaa pytestit `src/tests` kansiosta.
 - AI haku algoritmi (src/tests/test_search.py)
 - Transpositiotaulut (src/tests/test_transposition.py)
 
-**Testien lukumäärä:** 56 testiä yhteensä
+**Testien lukumäärä:** 56 testiä yhteensä  
+
 **Testikattavuus:** ~99%
 
 ---
