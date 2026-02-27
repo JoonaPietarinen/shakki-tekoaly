@@ -11,6 +11,7 @@ CI-pipeline ajaa pytestit `src/tests` kansiosta.
 - Transpositiotaulut (src/tests/test_transposition.py)
 
 **Testien lukumäärä:** 56 testiä yhteensä
+**Testikattavuus:** ~99%
 
 ---
 
