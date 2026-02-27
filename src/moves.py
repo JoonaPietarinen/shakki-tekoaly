@@ -4,7 +4,7 @@ def is_attacked(r: int, c: int, by_color: str, grid, board=None) -> bool:
     """Check if square (r, c) is attacked by side 'by_color'."""
 
     # Pawn attacks
-    pawn_dir = -1 if by_color == 'w' else 1
+    pawn_dir = 1 if by_color == 'w' else -1
     for dc in (-1, 1):
         rr = r + pawn_dir
         cc = c + dc
