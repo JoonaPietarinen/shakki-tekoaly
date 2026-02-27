@@ -26,17 +26,28 @@ CI-pipeline ajaa pytestit `src/tests` kansiosta.
 | test_to_fen_after_capture | e4d5 capture | d5:lla pawn, halfmove=0 | Pass |
 | test_to_fen_castling_rights | e2e4, e7e5, g1f3 | "KQkq" castling preserved | Pass |
 | test_to_fen_promotion | a7a8q | Queen on a8, pawn gone |  Pass |
+| test_start_fen | Board().set_fen("startpos") | Alkuasema asetettu oikein | Pass |
+| test_attempt_to_move_non_existent_piece | e3e4 (tyhjä ruutu) | Heittää ValueError | Pass |
 
 ### Siirtojen luonti (test_moves.py)
 
 | Testi | Syöte | Odotus | Tulos |
 |-------|-------|--------|-------|
-| test_start_position | Board() | 20 laillista siirtoa |  Pass |
+| test_start_position | Board() | 20 laillista siirtoa | Pass |
 | test_promotion | "8/P7/8/8/8/8/8/K6k w - - 0 1" | Sisältää a7a8q, a7a8r, a7a8b, a7a8n | Pass |
 | test_castling | "r3k2r/8/.../8/R3K2R w KQkq - 0 1" | Sisältää e1g1 (kingside) ja e1c1 (queenside) | Pass |
 | test_en_passant | "rnbqkbnr/ppp1pppp/8/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 1" | Sisältää e5d6 (en passant) | Pass |
 | test_checkmate | "rk6/8/8/8/8/8/8/Kqr5 w KQkq - 0 1" | Ei liikkeitä, kuningas shakissa | Pass |
 | test_stalemate | "7k/5Q2/6K1/8/8/8/8/8 b - - 0 1" | Ei liikkeitä, kuningas ei shakissa | Pass |
+| test_not_stalemate | "7k/8/8/8/8/8/8/K7 b - - 0 1" | On liikkeitä (ei pattia) | Pass |
+| test_50_move_rule_not_yet_draw | Halfmove = 99 | Ei vielä draw-sääntöä | Pass |
+| test_50_move_rule_is_draw_at_100 | Halfmove = 100 | On draw (100 siirtoa) | Pass |
+| test_50_move_rule_is_draw_over_100 | Halfmove = 101 | On draw (yli 100 siirtoa) | Pass |
+| test_castling_black | "r3k2r/8/8/8/8/8/8/R3K2R b KQkq - 0 1" | Sisältää e8g8 ja e8c8 | Pass |
+| test_black_pawn_moves | "8/pp6/8/8/8/8/8/K6k b - - 0 1" | Sisältää a7a6/a7a5, b7b6/b7b5 | Pass |
+| test_black_knight_moves | "8/8/8/8/8/8/8/K5nk b - - 0 1" | Ratsu-siirtoja löytyy | Pass |
+| test_pawn_attacks_white | Valkoinen sotilas e4:lla | d5 ja f5 hyökkäävät | Pass |
+| test_pawn_attacks_black | Musta sotilas e5:lla | d4 ja f4 hyökkäävät | Pass |
 
 ### Transpositiotaulut (test_transposition.py)
 
@@ -76,6 +87,9 @@ CI-pipeline ajaa pytestit `src/tests` kansiosta.
 | test_null_window_search_enabled | ENABLE_NULL_WINDOW: True/False, depth=2 | Haun pitäisi onnistua NWS:stä riippumatta | Pass |
 | test_window_search_narrower_window | ENABLE_NULL_WINDOW: True, depth=3, all flags enabled | Löytää hyvän avaus siirron | Pass |
 | test_null_window_with_all_optimizations | ENABLE_NULL_WINDOW: True/False, depth=4, all optimizations | Haun pitäisi onnistua NWS+kaikki optimpoinnit yhdistelmällä | Pass |
+| test_ai_checkmate_detection | "rk6/8/8/8/8/8/8/Kqr5 w KQkq - 0 1" | Palauttaa None (matissa) | Pass |
+| test_ai_time_limit | depth=10, time_limit=0.1s | Palauttaa siirron ajassa | Pass |
+| test_ai_time_limit_prediction | depth=10, time_limit=10s | Palauttaa siirron 10s sisällä | Pass (skipped in CI) |
 
 ---
 
