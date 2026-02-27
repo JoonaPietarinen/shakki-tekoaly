@@ -6,11 +6,11 @@ CI-pipeline ajaa pytestit `src/tests` kansiosta.
 
 ### Testatut komponentit
 - Laudan esitystapa & FEN-muunnos (src/tests/test_board.py)
-- Siirtojen luonti (src/tests/test_moves.py)
+- Siirtojen luonti ja tarkistus (src/tests/test_moves.py)
 - AI haku algoritmi (src/tests/test_search.py)
 - Transpositiotaulut (src/tests/test_transposition.py)
 
-**Testien lukumäärä:** 41 testiä yhteensä
+**Testien lukumäärä:** 56 testiä yhteensä
 
 ---
 
@@ -80,6 +80,15 @@ CI-pipeline ajaa pytestit `src/tests` kansiosta.
 ---
 
 ## Testien ajaminen
+Aja testit Poetry-virtuaaliympäristössä:
+
+```bash
+poetry shell
+```
+Tai lisäämällä poetry run -komennon:
+```bash
+poetry run ... 
+```
 
 ### Kaikki testit
 ```bash
@@ -208,7 +217,7 @@ Kaikki testit ovat **deterministisiä:**
 
 **Testit voidaan toistaa milloin tahansa:**
 ```bash
-pytest src/tests/ -v --tb=short
+pytest src/tests/ -v
 ```
 
 ---
@@ -224,18 +233,24 @@ Transpositiotaulut
 Negamax haku  
 Alpha-beta karsinta  
 Mattien tunnistaminen  
-Iteratiivinen syventäminen  
-Shakin tarkistus  
-Quiescence search
-Historiaheuristiikka
-Killer moves
-Null window search
+Pattien tunnistaminen  
+Shakin tunnistaminen  
+Iteratiivinen syventäminen   
+Quiescence search  
+Historiaheuristiikka  
+Killer moves  
+Null window search  
+Pawn attacks  
+King attacks  
+50-siirron säännön tarkistus  
+En passant tarkistus  
+Virheellisten siirtojen tunnistus
 
 ---
 
 ## Johtopäätökset
 
-- **41 yksikkötestiä** kattaa ydin ominaisuudet ja optimoinnit
+- **56 yksikkötestiä** kattaa ydin ominaisuudet ja optimoinnit
 - **Kaikki testit menevät läpi**
 - **Profilointi osoittaa** algoritmin tehokkuuden ja optimointien vaikutukset
 - **Deterministiset testit** toistettavissa milloin tahansa
