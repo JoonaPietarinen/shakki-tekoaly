@@ -1,0 +1,11 @@
+[run]
+omit =
+    */site-packages/*
+    */venv/*
+    src/smart_ai.py
+    src/profiling.py
+    src/stupid_ai.py
+
+[report]
+exclude_lines =
+    pragma: no cover
