@@ -141,7 +141,7 @@ Käytetty: src/profile.py
 python src/profile.py
 ```
 
-**Tulokset (Esimerkki, uudempaa tietoa saa `Toteutusrapostti.md`):**
+**Tulokset (Esimerkki, uudempaa tietoa saa `Toteutusdokumentti.md`):**
 
 | Depth | Nodes Searched | TT Hits | TT Stores | Beta Cutoffs | Best Move |
 |-------|----------------|---------|-----------|-----------|-----------|
