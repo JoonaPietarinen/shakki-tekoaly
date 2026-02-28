@@ -1,9 +1,0 @@
-# Ignore test files
-src/tests/
-
-# Ignore profiling/dev scripts
-src/profiling.py
-src/stupid_ai.py
-
-# Ignore config files
-tiraconfig/
