@@ -98,6 +98,7 @@ def profile_optimization_combinations():
         print_search_stats()
         print(f"Time: {elapsed:.3f}s")
         print(f"Best move: {move}")
+        print(f"Score: {score}")
     
     # Restore defaults
     search.ENABLE_QUIESCENCE = True
@@ -148,7 +149,7 @@ def profile_search():
         print(f"\nDepth {depth}:")
         print_search_stats()
         print(f"Best move: {move}\n")
-
+        print(f"Score: {score}")
 
 def profile_iterative_deepening():
     """Profile iterative deepening with time limits."""
@@ -226,6 +227,7 @@ def detailed_profile():
     
     print(s.getvalue())
     print(f"\nBest move: {move}")
+    print(f"Score: {score}")
     print_search_stats()
 
 

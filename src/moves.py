@@ -1,6 +1,6 @@
 from board import coord_to_sq, sq_to_coord
 
-def is_attacked(r: int, c: int, by_color: str, grid, board=None) -> bool:
+def is_attacked(r: int, c: int, by_color: str, grid, _board=None) -> bool:
     """Check if square (r, c) is attacked by side 'by_color'."""
 
     # Pawn attacks
@@ -121,7 +121,7 @@ def generate_legal_moves(board):
                 if ep_r == one_r and ep_c == cc:
                     add_pseudo(r, c, one_r, cc)
 
-    def gen_knight(r: int, c: int, piece: str):
+    def gen_knight(r: int, c: int, _piece: str):
         deltas = [(2, 1), (2, -1), (-2, 1), (-2, -1), (1, 2), (1, -2), (-1, 2), (-1, -2)]
         for dr, dc in deltas:
             nr, nc = r + dr, c + dc
@@ -129,7 +129,7 @@ def generate_legal_moves(board):
                 continue
             add_pseudo(r, c, nr, nc)
 
-    def gen_slider(r: int, c: int, piece: str, directions):
+    def gen_slider(r: int, c: int, _piece: str, directions):
         for dr, dc in directions:
             nr, nc = r + dr, c + dc
             while in_bounds(nr, nc):
@@ -141,7 +141,7 @@ def generate_legal_moves(board):
                 nr += dr
                 nc += dc
 
-    def gen_king(r: int, c: int, piece: str):
+    def gen_king(r: int, c: int, _piece: str):
         for dr in (-1, 0, 1):
             for dc in (-1, 0, 1):
                 if dr == 0 and dc == 0:

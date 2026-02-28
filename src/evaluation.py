@@ -119,6 +119,8 @@ def evaluate(board):
                 else:  # White piece
                     index = r * 8 + c
                     bonus = table[index]
+            else: # pragma : no cover
+                bonus = 0 # Redundant, should not happen. But just in case.
 
             
             # Add material + positional value

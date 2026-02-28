@@ -133,7 +133,7 @@ def quiescence(board, alpha, beta, ply=0):
     return alpha
 
 
-def negamax(board, depth, alpha, beta, color=1, tt_move=None, ply=0):
+def negamax(board, depth, alpha, beta, _color=1, tt_move=None, ply=0):
     """
     Negamax search with alpha-beta pruning and transposition table.
     Uses history heuristic and killer moves for move ordering.
@@ -298,7 +298,7 @@ def find_best_move(board, depth, time_limit):
                     best_score = score
             else:
                 # Score is within expected range, use null-window result
-                score, move = null_score, move
+                score = null_score
                 if move:
                     best_move = move
                     best_score = null_score

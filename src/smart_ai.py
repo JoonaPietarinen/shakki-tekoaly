@@ -1,4 +1,3 @@
-import time
 from board import Board
 from moves import generate_legal_moves, is_checkmate, is_stalemate, is_draw_by_fifty_moves
 from search import find_best_move, clear_transposition_table

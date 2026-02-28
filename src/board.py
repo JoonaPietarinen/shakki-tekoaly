@@ -8,8 +8,8 @@ random.seed(42)
 ZOBRIST_TABLE = {}
 
 # Generate Zobrist keys for all pieces and squares
-for piece in 'pnbrqkPNBRQK':
-    ZOBRIST_TABLE[piece] = [random.getrandbits(64) for _ in range(64)]
+for piece_type in 'pnbrqkPNBRQK':
+    ZOBRIST_TABLE[piece_type] = [random.getrandbits(64) for _ in range(64)]
 
 ZOBRIST_WHITE = random.getrandbits(64)
 ZOBRIST_BLACK = random.getrandbits(64)
@@ -37,10 +37,21 @@ def sq_to_coord(row: int, col: int):
 class Board:
     def __init__(self, fen: str = None):
         """Initialize board from FEN string or default start position."""
+        # Initialize all attributes with default values
+        self.grid = []
+        self.turn = 'w'
+        self.castling = 'KQkq'
+        self.en_passant = None
+        self.halfmove = 0
+        self.fullmove = 1
+        self.hash = 0
+
         if fen and fen != "startpos_fen":
             self.set_fen(fen)
         else:  
             self.set_fen(START_FEN)
+
+
 
     def set_fen(self, fen: str):
         """Parse FEN string into internal board state and compute initial hash."""
