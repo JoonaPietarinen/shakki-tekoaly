@@ -70,13 +70,13 @@ def mvv_lva_score(board, move: str) -> tuple:
     to_sq = move[2:4]
     fr, fc = coord_to_sq(from_sq)
     tr, tc = coord_to_sq(to_sq)
-    
+
     victim = board.grid[tr][tc]
     attacker = board.grid[fr][fc]
-    
+
     victim_value = PIECE_VALUES.get(victim, 0)
     attacker_value = PIECE_VALUES.get(attacker, 0)
-    
+
     # Return tuple: higher victim value first, then lower attacker value
     return (victim_value, -attacker_value)
 
@@ -97,43 +97,43 @@ def quiescence(board, alpha, beta, ply=0):
     """
     global search_stats
     search_stats['quiescence_nodes'] += 1
-    
+
     # Stand pat: evaluate current position
     # If position is already good enough, we don't need to search further
     stand_pat = evaluate_from_perspective(board)
-    
+
     if stand_pat >= beta:
         return beta
-    
+
     alpha = max(alpha, stand_pat)
-    
+
     # Generate all legal moves and filter to only captures
     all_moves = generate_legal_moves(board)
     interesting_moves = [m for m in all_moves if is_capture(board, m)]
-    
+
     # Sort captures by MVV-LVA (Most Valuable Victim first)
     interesting_moves.sort(key=lambda m: mvv_lva_score(board, m), reverse=True)
-    
+
     # If no captures, position is quiet - return eval
     if not interesting_moves:
         return stand_pat
-    
+
     for move in interesting_moves:
         temp = board.copy()
         temp.make_move(move)
-        
+
         # Recursive quiescence call
         score = -quiescence(temp, -beta, -alpha, ply + 1)
-        
+
         if score >= beta:
             return beta
-        
+
         alpha = max(alpha, score)
-    
+
     return alpha
 
 
-def negamax(board, depth, alpha, beta, color=1, tt_move=None, ply=0):
+def negamax(board, depth, alpha, beta, _color=1, tt_move=None, ply=0):
     """
     Negamax search with alpha-beta pruning and transposition table.
     Uses history heuristic and killer moves for move ordering.
@@ -155,7 +155,7 @@ def negamax(board, depth, alpha, beta, color=1, tt_move=None, ply=0):
 
     board_hash = board.hash  # Use incremental hash
     alpha_orig = alpha
-    
+
     # Transposition table lookup
     if board_hash in transposition_table:
         entry = transposition_table[board_hash]
@@ -171,7 +171,7 @@ def negamax(board, depth, alpha, beta, color=1, tt_move=None, ply=0):
                 beta = min(beta, entry_score)
             if alpha >= beta:
                 return entry_score, entry.get('move')
-    
+
     # Base case: depth 0
     if depth == 0:
         if ENABLE_QUIESCENCE:
@@ -183,22 +183,22 @@ def negamax(board, depth, alpha, beta, color=1, tt_move=None, ply=0):
     if not moves:
         # Checkmate or stalemate
         return -100000, None
-    
+
     # Move ordering: TT move first, then killer moves, then history heuristic
     ordered_moves = []
-    
+
     # 1. TT move (best move from previous search)
     if tt_move and tt_move in moves:
         ordered_moves.append(tt_move)
         moves.remove(tt_move)
-    
+
     # 2. Killer moves (good cutoff moves from same depth)
     if ENABLE_KILLER_MOVES and ply < MAX_DEPTH:
         for killer in killer_moves[ply]:
             if killer and killer in moves:
                 ordered_moves.append(killer)
                 moves.remove(killer)
-    
+
     # 3. Remaining moves sorted by history heuristic
     if ENABLE_HISTORY_HEURISTIC:
         remaining_with_history = [(m, history_table.get(m[:4], 0)) for m in moves]
@@ -209,45 +209,45 @@ def negamax(board, depth, alpha, beta, color=1, tt_move=None, ply=0):
 
     best_move = None
     best_score = float('-inf')
-    
+
     for move in ordered_moves:
         temp = board.copy()
         _ = temp.make_move(move)
-        
+
         # Recursive negamax call (negate score and swap alpha/beta)
         score, _ = negamax(temp, depth - 1, -beta, -alpha, ply=ply+1)
         score = -score
-        
+
         if score > best_score:
             best_score = score
             best_move = move
-        
+
         # Alpha-beta pruning
         alpha = max(alpha, score)
         if alpha >= beta:
             # Beta cutoff: update history heuristic and killer moves
             search_stats['beta_cutoffs'] += 1
-            
+
             # Update history heuristic (quiet moves that cause cutoffs)
             if ENABLE_HISTORY_HEURISTIC and not is_capture(board, move):
                 move_key = move[:4]
                 history_table[move_key] = history_table.get(move_key, 0) + depth * depth
-            
+
             # Update killer moves
             if ENABLE_KILLER_MOVES and ply < MAX_DEPTH:
                 if killer_moves[ply][0] != move:
                     killer_moves[ply][1] = killer_moves[ply][0]
                     killer_moves[ply][0] = move
-            
+
             break
-    
+
     if alpha >= beta:
         flag = LOWER
     elif best_score > alpha_orig:
         flag = EXACT
     else:
         flag = UPPER
-    
+
     # Store in transposition table
     transposition_table[board_hash] = {
         'depth': depth,
@@ -267,29 +267,29 @@ def find_best_move(board, depth, time_limit):
     best_move = None
     best_score = None
     start_time = time.time()
-    
+
     # Iterative deepening: search depth 1, 2, 3... up to max_depth
     for current_depth in range(1, depth + 1):
         search_stats['reached_depth'] = current_depth  # Track current depth
         elapsed = time.time() - start_time
-        
+
         # Smart time management: don't start new iteration if unlikely to finish
         if time_limit:
             if elapsed > time_limit:
                 # Soft limit: time expired, use best move from previous iteration
                 break
-            
+
             # Predict if we have enough time for next iteration
             # Next depth typically takes ~3-5x longer than previous
             # Don't start if we've used more than 40% of time budget
             if current_depth > 1 and elapsed > 0.4 * time_limit: # pragma: no cover
                 break
-        
+
         # Try null-window search first if enabled
         if ENABLE_NULL_WINDOW and best_score is not None:
             # Null-window search: search with narrow window to quickly verify if move is good
             null_score, move = negamax(board, current_depth, best_score, best_score + 1, ply=0)
-            
+
             if null_score >= best_score + 1:
                 # Re-search with full window
                 score, move = negamax(board, current_depth, float('-inf'), float('inf'), ply=0)
@@ -298,18 +298,18 @@ def find_best_move(board, depth, time_limit):
                     best_score = score
             else:
                 # Score is within expected range, use null-window result
-                score, move = null_score, move
+                score = null_score
                 if move:
                     best_move = move
                     best_score = null_score
         else:
             # No best_score yet or null-window disabled, do full search
             score, move = negamax(board, current_depth, float('-inf'), float('inf'), ply=0)
-            
+
             if move:
                 best_move = move
                 best_score = score
-    
+
     return best_move
 
 def print_search_stats(): # pragma: no cover

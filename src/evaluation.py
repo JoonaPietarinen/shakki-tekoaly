@@ -99,16 +99,16 @@ def evaluate(board):
     Positive = white advantage, negative = black advantage.
     """
     score = 0
-    
+
     for r in range(8):
         for c in range(8):
             piece = board.grid[r][c]
             if piece == '.':
                 continue
-            
+
             piece_type = piece.lower()
             piece_value = PIECE_VALUES.get(piece_type, 0)
-            
+
             # Get piece-square table bonus
             if piece_type in PIECE_SQUARE_TABLES:
                 table = PIECE_SQUARE_TABLES[piece_type]
@@ -119,14 +119,16 @@ def evaluate(board):
                 else:  # White piece
                     index = r * 8 + c
                     bonus = table[index]
+            else: # pragma : no cover
+                bonus = 0 # Redundant, should not happen. But just in case.
 
-            
+
             # Add material + positional value
             if piece.isupper():  # White
                 score += piece_value + bonus
             else:  # Black
                 score -= piece_value + bonus
-    
+
     return score
 
 

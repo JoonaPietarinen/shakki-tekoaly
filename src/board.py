@@ -8,8 +8,8 @@ random.seed(42)
 ZOBRIST_TABLE = {}
 
 # Generate Zobrist keys for all pieces and squares
-for piece in 'pnbrqkPNBRQK':
-    ZOBRIST_TABLE[piece] = [random.getrandbits(64) for _ in range(64)]
+for piece_type in 'pnbrqkPNBRQK':
+    ZOBRIST_TABLE[piece_type] = [random.getrandbits(64) for _ in range(64)]
 
 ZOBRIST_WHITE = random.getrandbits(64)
 ZOBRIST_BLACK = random.getrandbits(64)
@@ -37,10 +37,21 @@ def sq_to_coord(row: int, col: int):
 class Board:
     def __init__(self, fen: str = None):
         """Initialize board from FEN string or default start position."""
+        # Initialize all attributes with default values
+        self.grid = []
+        self.turn = 'w'
+        self.castling = 'KQkq'
+        self.en_passant = None
+        self.halfmove = 0
+        self.fullmove = 1
+        self.hash = 0
+
         if fen and fen != "startpos_fen":
             self.set_fen(fen)
-        else:  
+        else:
             self.set_fen(START_FEN)
+
+
 
     def set_fen(self, fen: str):
         """Parse FEN string into internal board state and compute initial hash."""
@@ -56,20 +67,20 @@ class Board:
                     row += ['.'] * int(ch)
                 else:
                     row.append(ch)
-            self.grid.append(row)   
+            self.grid.append(row)
         self.turn = parts[1]
         self.castling = parts[2]
         self.en_passant = parts[3] if parts[3] != '-' else None
         self.halfmove = int(parts[4])
         self.fullmove = int(parts[5])
-        
+
         # Compute initial Zobrist hash
         self.hash = self._compute_hash()
-    
+
     def _compute_hash(self):
         """Compute Zobrist hash for the current board position."""
         h = 0
-        
+
         # Hash pieces
         for r in range(8):
             for c in range(8):
@@ -77,7 +88,7 @@ class Board:
                 if piece != '.':
                     square_index = r * 8 + c
                     h ^= ZOBRIST_TABLE[piece][square_index]
-        
+
         # Hash turn
         if self.turn == 'w':
             h ^= ZOBRIST_WHITE
@@ -94,7 +105,7 @@ class Board:
         if self.en_passant:
             ep_file = ord(self.en_passant[0]) - ord('a')
             h ^= ZOBRIST_EP[ep_file]
-        
+
         return h
 
     def to_fen(self) -> str:
@@ -107,7 +118,7 @@ class Board:
                 if ch == '.':
                     empty += 1
                 else:
-                    if empty: 
+                    if empty:
                         comp.append(str(empty))
                         empty = 0
                     comp.append(ch)
@@ -140,13 +151,13 @@ class Board:
         if self.en_passant:
             ep_file = ord(self.en_passant[0]) - ord('a')
             self.hash ^= ZOBRIST_EP[ep_file]
-        
+
         # Remove old castling rights from hash
         if self.castling != '-':
             for right in self.castling:
                 if right in ZOBRIST_CASTLING:
                     self.hash ^= ZOBRIST_CASTLING[right]
-        
+
         # Remove piece from source square
         from_index = fr * 8 + fc
         self.hash ^= ZOBRIST_TABLE[piece][from_index]
@@ -159,7 +170,7 @@ class Board:
             captured_pawn = self.grid[captured_pawn_row][tc]
             captured_index = captured_pawn_row * 8 + tc
             self.hash ^= ZOBRIST_TABLE[captured_pawn][captured_index]
-            
+
             self.grid[captured_pawn_row][tc] = '.'
             capture = True
             ep_capture = True
@@ -192,17 +203,17 @@ class Board:
             else:  # Queenside
                 rook_from = (fr, 0)
                 rook_to = (fr, 3)
-            
+
             rook_piece = self.grid[rook_from[0]][rook_from[1]]
-            
+
             # Remove rook from old position in hash
             rook_from_index = rook_from[0] * 8 + rook_from[1]
             self.hash ^= ZOBRIST_TABLE[rook_piece][rook_from_index]
-            
+
             # Move rook
             self.grid[rook_from[0]][rook_from[1]] = '.'
             self.grid[rook_to[0]][rook_to[1]] = rook_piece
-            
+
             # Add rook to new position in hash
             rook_to_index = rook_to[0] * 8 + rook_to[1]
             self.hash ^= ZOBRIST_TABLE[rook_piece][rook_to_index]
@@ -237,7 +248,7 @@ class Board:
 
         if not self.castling:
             self.castling = '-'
-        
+
         # Add new castling rights to hash
         if self.castling != '-':
             for right in self.castling:
@@ -266,10 +277,10 @@ class Board:
         # Toggle turn in hash
         self.hash ^= ZOBRIST_WHITE
         self.hash ^= ZOBRIST_BLACK
-        
+
         self.turn = 'b' if self.turn == 'w' else 'w'
 
-    
+
     def copy(self):
         """Create a shallow copy of the board for search calculations."""
         new_board = Board.__new__(Board)  # Create without calling __init__
