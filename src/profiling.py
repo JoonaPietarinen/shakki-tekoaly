@@ -82,7 +82,7 @@ def profile_optimization_combinations():
 
         b = Board()
         start = time.time()
-        score, move = negamax(b, 4, float('-inf'), float('inf'))
+        score, move = negamax(b, 5, float('-inf'), float('inf'))
         elapsed = time.time() - start
 
         results.append({
@@ -175,6 +175,7 @@ def profile_iterative_deepening():
     print(f"Time: {elapsed:.3f}s")
     print_search_stats()
     print(f"Best move: {move}")
+    #print(f"Score: {score}")
 
     # Test 2: Time limit tests
     for time_limit in [0.1, 0.5, 1, 2, 5]:
@@ -195,6 +196,7 @@ def profile_iterative_deepening():
         print(f"Actual time: {elapsed:.3f}s")
         print_search_stats()
         print(f"Best move: {move}")
+        #print(f"Score: {score}")
 
 
 def detailed_profile():

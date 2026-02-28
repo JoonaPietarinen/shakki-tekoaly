@@ -310,7 +310,7 @@ def find_best_move(board, depth, time_limit):
                 best_move = move
                 best_score = score
 
-    return best_move
+    return best_move #,best_score   # Can return score if needed for profiling
 
 def print_search_stats(): # pragma: no cover
     print(f"Nodes searched: {search_stats['nodes_searched']}")

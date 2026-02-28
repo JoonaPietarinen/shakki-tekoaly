@@ -44,35 +44,40 @@ Profiling-tulokset (src/profiling.py):
 
 `profile_search()`:
 
-| Depth | Brute Force | Mitattu | Nopeutus | TT Hits | Beta Cutoffs |
-|-------|-------------|---------|----------|---------|--------------|
-| 2 | 1,225 | 131 | **9.4x** | 0% | 16 |
-| 3 | 42,875 | 545 | **78.7x** | 0% | 38 |
-| 4 | 1,500,625 | 1,386 | **1,083x** | 2.8% | 443 |
-| 5 | 52,521,875 | 18,771 | **2,797x** | 1.3% | 1,795 |
+| Depth | Brute Force | Mitattu | Nopeutus | QS Nodes | TT Hits | Beta Cutoffs | Score |
+|-------|-------------|---------|----------|----------|---------|--------------|-------|
+| 2 | 1,225 | 131 | **9.4x** | 110 | 0% | 16 | -160 |
+| 3 | 42,875 | 545 | **78.7x** | 487 | 0% | 38 | -110 |
+| 4 | 1,500,625 | 1,374 | **1,092x** | 958 | 2.8% | 443 | -130 |
+| 5 | 52,521,875 | 8,696 | **6,038x** | 7,862 | 2.8% | 835 | -90 |
 
-**Huomio:** TT säilytetään kaikille syvyyksille → TT osumat kasvaa syvemmillä tasoilla
+**Huomio:** TT säilytetään kaikille syvyyksille → TT osumat ja tehokkuus kasvaa syvemmillä tasoilla
 
-`profile_iterative_deepening()` ennen viikon 5 optimointeja (Quiescence search ja MVV-LVA):
+Feature toggle (Depth 5):
 
-| Time Limit | Actual Time | Reached Depth | Nodes | TT Hits | Best Move |
-|------------|----------------|----------------|-------|---------|-----------|
-| 0.1s | 0.205s | 5 | 2,044 | 1.1% | b1c3 |
-| 0.5s | 0.205s | 5 | 2,044 | 1.1% | b1c3 |
-| 1.0s | 1.759s | 6 | 22,260 | 1.3% | e2e4 |
-| 2.0s | 1.759s | 6 | 22,260 | 1.3% | e2e4 |
-| 5.0s | 10.061s | 7 | 121,914 | 3.2% | b1c3 |
+| Scenario | Negamax Nodes | QS Nodes | Time | Speedup | TT Hits | Score |
+|----------|---------------|----------|------|---------|---------|-------|
+| Baseline (no optimizations) | 237,203 | 0 | 12.698s | 1.00x | 1.7% | -70 |
+| Quiescence only | 164,632 | 169,267 | 23.022s | 1.44x | 2.1% | -90 |
+| QS + Killer Moves | 26,981 | 25,099 | 3.884s | **8.79x** | 1.4% | -90 |
+| QS + History | 18,997 | 19,909 | 3.900s | **12.49x** | 2.8% | -90 |
+| All Optimizations | 16,340 | 15,054 | 2.907s | **14.52x** | 2.1% | -90 |
+| All + Null-Window | 16,340 | 15,054 | 2.916s | **14.52x** | 2.1% | -90 |
 
-Viikon 5 optimointien jälkeen (Quiescence search ja MVV-LVA):
-| Time Limit | Actual Time | Reached Depth | Nodes | Quiescence Nodes | TT Hits | Best Move |
-|------------|----------------|----------------|-------|----------------|---------|-----------|
-| 0.1s | 0.062s | 4 | 641 | 561 | 0% | b1c3 |
-| 0.5s | 0.475s | 5 | 2,049 | 1,608 | 1.1% | b1c3 |
-| 1.0s | 0.472s | 5 | 2,049 | 1,608 | 1.1% | b1c3 |
-| 2.0s | 1.706s | 6 | 15,650 | 14,164 | 1.3% | b1c3 |
-| 5.0s | 10.326s | 7 | 41,169 | 35,572 | 6.4% | b1c3 |
+**Huomio:** Speedup viittaa solmujen vähennykseen, ei suoraan aikaan (baseline nodes/scenario nodes = 237203/x).
+
+Iteratiivinen syveneminen (kaikki optimoinnit):
+
+| Time Limit | Actual Time | Reached Depth | Negamax Nodes | QS Nodes | TT Hits | Score | Best Move |
+|------------|----------------|----------------|---------------|----------|---------|-------|-----------|
+| 0.1s | 0.090s | 4 | 871 | 771 | 2.5% | -110 | b1c3 |
+| 0.5s | 0.463s | 5 | 1,759 | 1,369 | 3.9% | -110 | b1c3 |
+| 1.0s | 0.468s | 5 | 1,759 | 1,369 | 3.9% | -110 | b1c3 |
+| 2.0s | 1.938s | 6 | 14,270 | 12,753 | 5.2% | -90 | b1c3 |
+| 5.0s | 7.993s | 7 | 28,603 | 24,060 | 10.4% | -90 | b1c3 |
 
 **Huomio:** Time Limit voi ylittyä, jos uudella iteraatiolla aikaa on vielä yli 40% jäljellä. Toisaalta se voi myös alittua, jos aikaa on alle 40% jäljellä, jolloin iteraatio keskeytetään.
+Voimme myös huomata, että vaikka paras siirto on b1c3 kaikilla syvyyksillä, pistearvio ei kuitenkaan ole identtinen. Syvemmillä hauilla siirto arvioidaan huonommaksi, mutta silti parhaaksi.
 
 
 ## Miksi mitattu on paljon pienempi kuin teoria?
@@ -101,35 +106,29 @@ Viikon 5 optimointien jälkeen (Quiescence search ja MVV-LVA):
 **Suora haku per syvyys (TT säilytetään):**
 - Depth 2: 131 solmua (TT tyhjä)
 - Depth 3: 545 solmua (hyötyy depth 2 TT:stä)
-- Depth 4: 1,386 solmua (hyötyy depth 2-3 TT:stä)
-- Depth 5: 18,771 solmua (hyötyy depth 2-4 TT:stä)
+- Depth 4: 1,374 solmua (hyötyy depth 2-3 TT:stä)
+- Depth 5: 8,696 solmua (hyötyy depth 2-4 TT:stä)
 
 **Iteratiivinen syveneminen aika-rajoituksella (TT säilytetään):**
-- Depth 5 (0.1s): 2,044 solmua
-- Depth 6 (1.0s): 22,260 solmua
-- Depth 7 (5.0s): 121,914 solmua
-- TT hit rate nousee: 1.1% → 1.3% → 3.2%
+- Depth 4 (0.1s): 871 solmua
+- Depth 5 (0.5s): 1,759 solmua
+- Depth 6 (2.0s): 14,270 solmua
+- Depth 7 (5.0s): 28,603 solmua
+- TT hit rate nousee: 2.5% → 3.9% → 5.2% → 10.4%
 
-**Huomio:** Molemmissa TT säilytetään, joten hyödyt ovat samankaltaiset. Erona on aika-rajoituksen myötä mahdollinen syvempi haku.
+**Huomio:** Iteratiivinen syveneminen tuottaa merkittävästi vähemmän solmuja kuin suora haku syvään, koska transpositiotaulu kerää osumia jokaisen iteraation välillä. Esimerkiksi depth 5:ssä iteratiivinen (1,759 solmua) löytää neljä kertaa vähemmän solmuja kuin suora haku (8,696 solmua). Tämä johtuu kumulatiivisesta hyödystä alempien tasojen TT:stä.
 
-**Iteratiivinen syveneminen viikon 5 jälkeen:**
-- Depth 5 (0.5s): 2,049 negamax solmua
-- Depth 6 (2.0s): 15,650 negamax solmua
-- Depth 7 (5.0s): 41,169 negamax solmua
-- Quiescence nodes: 1,608 → 14,164 → 35,572
-- TT hit rate: 1.1% → 1.3% → 6.4%
-
-syvyydellä 7 tt hit rate tuplaantui. Aikavaatimukset pysyvät melko samana. Quiescence search ja MVV-LVA optimoinnit näyttävät esim. sen, että syvyyksillä 5 ja 6 aiemmin saatu tulos e2e4 ei ollutkaan paras siirto.
 ## Johtopäätökset
 
-- Alpha-Beta haulla + killer move orderingilla saavutetaan **2,797x nopeutus** depth 5:llä
-- Beta cutoffien määrä (1,795 / 18,771 = 9.6%) osoittaa tehokkaan alpha-beta karsinnan
-- Transposition taulu säilyy iteraatioiden välillä, mikä antaa:
-  - Osumia syvemmillä hauilla (depth 4-5)
-  - Paremman move orderingin (aiemmilta tasoilta)
-  - Kumulatiivisen hyödyn iteraatioissa
-- Move ordering (killer moves + TT) on kriittinen alpha-beta tehokkuudelle
-- Viikon 5 move ordering optimoinnit (Quiescence search + MVV-LVA) tuottivat merkittäviä hyötyjä syvemmillä hauilla, erityisesti TT hit rate nousi huomattavasti ja karsinta oli tehokkaampaa.
+- Kaikilla optimoinneilla (Killer moves + History + Quiescence) saavutetaan **14.52x nopeutus** depth 5:llä
+- Null-Window Search säilyttää saman nopeutuksen, mutta parantaa TT hyötyjä syvemmillä hauilla
+- Move ordering (killer moves + history heuristic) on kriittinen alpha-beta tehokkuudelle
+- Quiescence search vähentää solmuja merkittävästi, mutta on kallista ilman killer moves -optimointia
+- Transposition taulu säilyy iteraatioiden välillä, jolloin:
+  - Iteratiivinen syveneminen tuottaa 4-5x vähemmän solmuja kuin suora haku
+  - TT hit rate nousee 2.5% → 10.4% syvyyksien 4-7 välillä
+  - Kumulatiivinen hyöty keräytyy jokaisen iteraation välillä
+- Kaiken kaikkiaan, optimointiyhdistelmä (QS + Killer + History + NWS) mahdollistaa depth 7 haun 8 sekunnissa.
 # Lähteeet
 
 https://en.wikipedia.org/wiki/Minimax
