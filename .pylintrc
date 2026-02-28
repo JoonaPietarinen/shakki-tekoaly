@@ -1,0 +1,108 @@
+[MASTER]
+# Ignore patterns
+ignore=CVS,.git,__pycache__,.venv,venv
+ignore-patterns=test_.*?\.py,conftest.py
+init-hook='import sys; sys.path.append("src")'
+
+# Use multiple processes to speed up Pylint
+jobs=4
+
+[MESSAGES CONTROL]
+# Disable specific messages
+disable=
+    C0103,  # invalid-name (allow short variable names like r, c, b)
+    C0114,  # missing-module-docstring
+    C0115,  # missing-class-docstring
+    C0116,  # missing-function-docstring
+    R0913,  # too-many-arguments
+    R0914,  # too-many-locals
+    R0912,  # too-many-branches
+    R0915,  # too-many-statements
+    W0212,  # protected-access
+    C0301,  # line-too-long (handled by other tools)
+    R1705,  # no-else-return
+    R1710,  # inconsistent-return-statements
+    W0511,  # fixme (TODO comments)
+    R0911,  # too-many-return-statements
+
+[REPORTS]
+# Set the output format
+output-format=colorized
+
+# Include message's id in output
+msg-template={path}:{line}:{column}: {msg_id}: {msg} ({symbol})
+
+# Activate the evaluation score
+score=yes
+
+[BASIC]
+# Good variable names
+good-names=i,j,r,c,b,m,p,x,y,dr,dc,fr,fc,tr,tc,nr,nc,rr,cc
+
+# Naming style
+argument-naming-style=snake_case
+attr-naming-style=snake_case
+class-naming-style=PascalCase
+const-naming-style=UPPER_CASE
+function-naming-style=snake_case
+method-naming-style=snake_case
+module-naming-style=snake_case
+variable-naming-style=snake_case
+
+[FORMAT]
+# Maximum number of characters on a single line
+max-line-length=120
+
+# Maximum number of lines in a module
+max-module-lines=1000
+
+# String used as indentation unit
+indent-string='    '
+
+[DESIGN]
+# Maximum number of arguments for function/method
+max-args=7
+
+# Maximum number of attributes for a class
+max-attributes=10
+
+# Maximum number of boolean expressions in an if statement
+max-bool-expr=5
+
+# Maximum number of branch for function/method body
+max-branches=15
+
+# Maximum number of locals for function/method body
+max-locals=20
+
+# Maximum number of parents for a class
+max-parents=7
+
+# Maximum number of public methods for a class
+max-public-methods=20
+
+# Maximum number of return/yield for function/method body
+max-returns=6
+
+# Maximum number of statements in function/method body
+max-statements=60
+
+# Minimum number of public methods for a class
+min-public-methods=1
+
+[SIMILARITIES]
+# Minimum lines number of a similarity
+min-similarity-lines=6
+
+# Ignore comments when computing similarities
+ignore-comments=yes
+
+# Ignore docstrings when computing similarities
+ignore-docstrings=yes
+
+# Ignore imports when computing similarities
+ignore-imports=yes
+
+[EXCEPTIONS]
+# Exceptions that will emit a warning when caught
+overgeneral-exceptions=builtins.Exception
