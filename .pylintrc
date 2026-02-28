@@ -1,14 +1,9 @@
 [MASTER]
 # Ignore patterns
 ignore=CVS,.git,__pycache__,.venv,venv
-ignore-patterns=test_.*?\.py,conftest.py
+ignore-patterns=test_.*?\.py,conftest.py,profiling\.py,stupid_ai\.py
+init-hook='import sys; sys.path.append("src")'
 
-# Ignore specific files and directories
-ignore-paths=
-    ^.*/tests/.*$,
-    ^.*/profiling\.py$,
-    ^.*/stupid_ai\.py$,
-    ^tiraconfig/.*$
 
 # Use multiple processes to speed up Pylint
 jobs=4
