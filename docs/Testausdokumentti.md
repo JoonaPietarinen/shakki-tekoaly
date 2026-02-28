@@ -143,23 +143,24 @@ python src/profiling.py
 
 **Tulokset (Esimerkki, uudempaa tietoa saa `Toteutusdokumentti.md`):**
 
-| Depth | Nodes Searched | TT Hits | TT Stores | Beta Cutoffs | Best Move |
-|-------|----------------|---------|-----------|-----------|-----------|
-| 2 | 131 | 0 (0.0%) | 21 | 16 | b1c3 |
-| 3 | 545 | 0 (0.0%) | 60 | 38 | b1c3 |
-| 4 | 1,386 | 39 (2.8%) | 485 | 443 | b1c3 |
-| 5 | 18,771 | 241 (1.3%) | 2,389 | 1795 | e2e4 |
+| Depth | Brute Force | Mitattu | Nopeutus | QS Nodes | TT Hits | Beta Cutoffs | Score |
+|-------|-------------|---------|----------|----------|---------|--------------|-------|
+| 2 | 1,225 | 131 | **9.4x** | 110 | 0% | 16 | -160 |
+| 3 | 42,875 | 545 | **78.7x** | 487 | 0% | 38 | -110 |
+| 4 | 1,500,625 | 1,374 | **1,092x** | 958 | 2.8% | 443 | -130 |
+| 5 | 52,521,875 | 8,696 | **6,038x** | 7,862 | 2.8% | 835 | -90 |
 
-iteratiivisen syventämisen tulokset:
-| Time Limit | Reached Depth | Nodes Searched | TT Hits | TT Stores | Beta Cutoffs | Best Move |
-|------------|----------------|----------------|---------|-----------|--------------|-----------|
-| 0.1s | 5 | 2,044 | 23 (1.1%) | 583 | 516 | b1c3 |
-| 0.5s | 5 | 2,044 | 23 (1.1%) | 583 | 516 | b1c3 |
-| 1.0s | 6 | 22,260 | 291 (1.3%) | 3,257 | 2,544 | e2e4 |
-| 2.0s | 6 | 22,260 | 291 (1.3%) | 3,257 | 2,544 | e2e4 |
-| 5.0s | 7 | 121,914 | 3,925 (3.2%) | 23,053 | 19,813 | b1a3 |
+Iteratiivinen syveneminen (kaikki optimoinnit):
 
-Tätä käsitellään lisää tiedostossa `Toteutusrapostti.md`.
+| Time Limit | Actual Time | Reached Depth | Negamax Nodes | QS Nodes | TT Hits | Score | Best Move |
+|------------|----------------|----------------|---------------|----------|---------|-------|-----------|
+| 0.1s | 0.090s | 4 | 871 | 771 | 2.5% | -110 | b1c3 |
+| 0.5s | 0.463s | 5 | 1,759 | 1,369 | 3.9% | -110 | b1c3 |
+| 1.0s | 0.468s | 5 | 1,759 | 1,369 | 3.9% | -110 | b1c3 |
+| 2.0s | 1.938s | 6 | 14,270 | 12,753 | 5.2% | -90 | b1c3 |
+| 5.0s | 7.993s | 7 | 28,603 | 24,060 | 10.4% | -90 | b1c3 |
+
+Tätä käsitellään lisää tiedostossa `Toteutusdokumentti.md`.
 
 ---
 
