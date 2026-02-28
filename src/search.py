@@ -5,10 +5,10 @@ Includes quiescence search to avoid horizon effect.
 Includes move ordering: history heuristic and MVV-LVA for captures.
 """
 
+import time
 from evaluation import evaluate_from_perspective
 from moves import generate_legal_moves
 from board import coord_to_sq
-import time
 
 # Feature flags for optimization testing
 ENABLE_QUIESCENCE = True

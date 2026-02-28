@@ -104,7 +104,7 @@ def generate_legal_moves(board):
 
         one_r = r + direction
         if in_bounds(one_r, c) and grid[one_r][c] == '.':
-            add_pseudo(r, c, one_r, c, promote=(one_r == promo_row))
+            add_pseudo(r, c, one_r, c, promote=one_r == promo_row)
             two_r = r + 2 * direction
             if r == start_row and in_bounds(two_r, c) and grid[two_r][c] == '.':
                 add_pseudo(r, c, two_r, c)
@@ -115,7 +115,7 @@ def generate_legal_moves(board):
                 continue
             target = grid[one_r][cc]
             if opponent(target):
-                add_pseudo(r, c, one_r, cc, promote=(one_r == promo_row))
+                add_pseudo(r, c, one_r, cc, promote=one_r == promo_row)
             if board.en_passant:
                 ep_r, ep_c = coord_to_sq(board.en_passant)
                 if ep_r == one_r and ep_c == cc:
@@ -256,4 +256,3 @@ def is_stalemate(board):
 def is_draw_by_fifty_moves(board):
     """Check if draw by 50-move rule (100 half-moves)."""
     return board.halfmove >= 100
-
