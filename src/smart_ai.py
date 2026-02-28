@@ -21,20 +21,20 @@ def make_move(board: Board, search_depth, time_limit):
         Chosen move in UCI format
     """
     legal_moves = generate_legal_moves(board)
-    
+
     if not legal_moves:
         if is_checkmate(board):
             print("Checkmate!")
         elif is_stalemate(board):
             print("Stalemate!")
         raise RuntimeError("No legal moves available")
-    
+
     if is_draw_by_fifty_moves(board):
         print("Draw by fifty-move rule!")
-    
+
     print(f"Searching with depth {search_depth} and time limit {time_limit}s...")
     choice = find_best_move(board, depth=search_depth, time_limit=time_limit)
-    
+
     board.make_move(choice)
     return choice
 
@@ -44,10 +44,10 @@ def main():
     board = Board()
     search_depth = 10
     time_limit = 30
-    
+
     while True:
         opponent_move = input()
-        
+
         if opponent_move.startswith("BOARD:"):
             set_board(board, opponent_move.removeprefix("BOARD:"))
         elif opponent_move.startswith("RESET:"):

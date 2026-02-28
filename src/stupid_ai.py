@@ -23,10 +23,10 @@ def make_move(board: Board):
         elif is_stalemate(board):
             print("Stalemate! I have no legal moves but I'm not in check.")
         raise RuntimeError("No legal moves available")
-    
+
     if is_draw_by_fifty_moves(board):
         print("Draw by fifty-move rule!")
-    
+
     print(f"I found {len(legal_moves)} legal moves: {', '.join(legal_moves)}")
     choice = random.choice(legal_moves)
     board.make_move(choice)

@@ -12,7 +12,7 @@ def is_attacked(r: int, c: int, by_color: str, grid, _board=None) -> bool:
             p = grid[rr][cc]
             if p != '.' and ((p == 'P' and by_color == 'w') or (p == 'p' and by_color == 'b')):
                 return True
-    
+
     # Knight attacks
     for dr, dc in [(2, 1), (2, -1), (-2, 1), (-2, -1), (1, 2), (1, -2), (-1, 2), (-1, -2)]:
         rr, cc = r + dr, c + dc
@@ -23,7 +23,7 @@ def is_attacked(r: int, c: int, by_color: str, grid, _board=None) -> bool:
                     return True
                 if by_color == 'b' and p == 'n':
                     return True
-    
+
     # King attacks
     for dr in (-1, 0, 1):
         for dc in (-1, 0, 1):
@@ -37,7 +37,7 @@ def is_attacked(r: int, c: int, by_color: str, grid, _board=None) -> bool:
                         return True
                     if by_color == 'b' and p == 'k':
                         return True
-    
+
     # Sliding pieces (rooks, bishops, queens)
     def slide(directions, attackers):
         for dr, dc in directions:
@@ -53,7 +53,7 @@ def is_attacked(r: int, c: int, by_color: str, grid, _board=None) -> bool:
                 rr += dr
                 cc += dc
         return False
-    
+
     if slide([(1, 0), (-1, 0), (0, 1), (0, -1)], {'r', 'q'}):
         return True
     if slide([(1, 1), (1, -1), (-1, 1), (-1, -1)], {'b', 'q'}):
@@ -195,11 +195,11 @@ def generate_legal_moves(board):
     legal = []
     for m in pseudo:
         mover = color
-        
+
         # Copy board and make move
         temp = board.copy()
         _ = temp.make_move(m)
-        
+
         # Find king position after move
         king_pos = None
         for r in range(8):
@@ -210,13 +210,13 @@ def generate_legal_moves(board):
                     break
             if king_pos:
                 break
-        
+
         # Check if king is safe
         is_legal = False
         if king_pos:
             if not is_attacked(king_pos[0], king_pos[1], temp.turn, temp.grid):
                 is_legal = True
-        
+
         if is_legal:
             legal.append(m)
 

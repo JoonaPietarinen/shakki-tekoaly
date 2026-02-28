@@ -49,14 +49,14 @@ def test_stalemate():
     b = Board("7k/5Q2/6K1/8/8/8/8/8 b - - 0 1")
     moves = generate_legal_moves(b)
     assert len(moves) == 0, "Should be stalemate"
-    assert is_stalemate(b), "Should be True"    
+    assert is_stalemate(b), "Should be True"
 
 def test_not_stalemate():
     """Test stalemate detection."""
     b = Board("7k/8/8/8/8/8/8/K7 b - - 0 1")
     moves = generate_legal_moves(b)
     assert len(moves) > 0, "Should not be stalemate"
-    assert not is_stalemate(b), "Should be False" 
+    assert not is_stalemate(b), "Should be False"
 
 def test_50_move_rule_not_yet_draw():
     """Test 50-move rule, not yet draw at 99."""
@@ -110,12 +110,12 @@ def test_pawn_attacks_black():
     grid = b.grid
     assert is_attacked(4, 3, 'b', grid), "d4 should be attacked by black pawn on e5"
     assert is_attacked(4, 5, 'b', grid), "f4 should be attacked by black pawn on e5"
-  
+
 def test_black_king_attacks():
     """Test that king attacks are detected correctly for black king."""
     from moves import is_attacked
     b = Board("8/8/8/8/4k3/8/8/1K6 b - - 0 1")
-    
+
     grid = b.grid
     assert is_attacked(3, 3, 'b', grid), "d5 should be attacked by black king"
     assert is_attacked(5, 5, 'b', grid), "f3 should be attacked by black king"
