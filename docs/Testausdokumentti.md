@@ -141,7 +141,7 @@ Käytetty: src/profile.py
 python src/profiling.py
 ```
 
-**Tulokset (Esimerkki, uudempaa tietoa saa `Toteutusdokumentti.md`):**
+**Tulokset:**
 
 | Depth | Brute Force | Mitattu | Nopeutus | QS Nodes | TT Hits | Beta Cutoffs | Score |
 |-------|-------------|---------|----------|----------|---------|--------------|-------|
