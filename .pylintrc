@@ -25,6 +25,9 @@ disable=
     R1710,  # inconsistent-return-statements
     W0511,  # fixme (TODO comments)
     R0911,  # too-many-return-statements
+    W0602,  # global-variable-not-assigned
+    W0603,  # global-statement (necessary for search stats)
+    R0917,  # too-many-positional-arguments (negamax needs 6+)
 
 [REPORTS]
 # Set the output format
