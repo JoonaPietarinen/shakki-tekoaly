@@ -138,7 +138,7 @@ pytest src/tests/ --cov=src --cov-report=html
 Käytetty: src/profile.py
 
 ```bash
-python src/profile.py
+python src/profiling.py
 ```
 
 **Tulokset (Esimerkki, uudempaa tietoa saa `Toteutusdokumentti.md`):**
