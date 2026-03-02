@@ -10,7 +10,6 @@ Kyseessä on shakkitekoäly, jota vastaan voi pelata [AI-platform alustalla](htt
 - Killer move heurestiikka (move ordering)
 - Iteratiivinen syveneminen
 - Inkrementaalinen Zobrist hash päivitys
-- Optimoitu board copy (list comprehension)
 - Quiescence search
 - History heuristic (move ordering)
 - MVV-LVA (Most Valuable Victim - Least Valuable Aggressor) (move ordering)
