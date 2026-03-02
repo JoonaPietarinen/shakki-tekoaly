@@ -7,7 +7,7 @@ Includes move ordering: history heuristic and MVV-LVA for captures.
 
 import time
 from evaluation import evaluate_from_perspective
-from moves import generate_legal_moves
+from moves import generate_legal_moves, is_stalemate, is_checkmate
 from board import coord_to_sq
 
 # Feature flags for optimization testing
@@ -182,7 +182,10 @@ def negamax(board, depth, alpha, beta, _color=1, tt_move=None, ply=0):
     moves = generate_legal_moves(board)
     if not moves:
         # Checkmate or stalemate
-        return -100000, None
+        if is_stalemate(board):
+            return 0, None
+        if is_checkmate(board):
+            return -100000, None
 
     # Move ordering: TT move first, then killer moves, then history heuristic
     ordered_moves = []
@@ -309,7 +312,11 @@ def find_best_move(board, depth, time_limit):
             if move:
                 best_move = move
                 best_score = score
-
+    print("---demo print---")
+    print(f"score: {best_score}")
+    print_search_stats()
+    print(f"Time spent: {elapsed}")
+    print("---demo print---")
     return best_move #,best_score   # Can return score if needed for profiling
 
 def print_search_stats(): # pragma: no cover

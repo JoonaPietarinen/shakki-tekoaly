@@ -42,8 +42,8 @@ def make_move(board: Board, search_depth, time_limit):
 def main():
     """Main loop: receive commands and play moves."""
     board = Board()
-    search_depth = 10
-    time_limit = 30
+    search_depth = 100
+    time_limit = 1
 
     while True:
         opponent_move = input()
