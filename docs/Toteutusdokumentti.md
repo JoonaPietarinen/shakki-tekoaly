@@ -5,15 +5,18 @@ Kyseessä on shakkitekoäly, jota vastaan voi pelata [AI-platform alustalla](htt
 
 **Implementoidut optimoinnit:**
 - Negamax + Alpha-Beta karsinta
+- Iteratiivinen syveneminen
 - Transpositiotaulu (Zobrist hash)
 - Evaluointifunktio (materiaali + piece-square tables)
-- Killer move heurestiikka (move ordering)
-- Iteratiivinen syveneminen
-- Inkrementaalinen Zobrist hash päivitys
-- Quiescence search
-- History heuristic (move ordering)
-- MVV-LVA (Most Valuable Victim - Least Valuable Aggressor) (move ordering)
 - Null-window search
+- Quiescence search
+- MVV-LVA (Most Valuable Victim - Least Valuable Aggressor) (move ordering)
+- Killer move heurestiikka (move ordering)
+- History heuristic (move ordering)
+- Inkrementaalinen Zobrist hash päivitys
+
+
+
 
 Shakin pelilogiikka on toteutettu `board.py` sekä `moves.py` tiedostoihin. `moves.py` keskittyy laillisten siirtojen generointiin, sekä shakkimatin että patin(stalemate) tunnistamiseen. `board.py` käsittelee kaiken muun pelilogiikan.
 # Aika- ja Tilavaativuusanalyysi
