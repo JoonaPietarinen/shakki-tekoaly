@@ -303,6 +303,7 @@ def find_best_move(board, depth, time_limit):
             else:
                 # Fail-low: keep previous best from earlier completed depth.
                 # Do not trust null-window move/score as exact.
+                # In KRK cituation, null-window always lead to stalemate.
                 pass
         else:
             # No best_score yet or null-window disabled, do full search
