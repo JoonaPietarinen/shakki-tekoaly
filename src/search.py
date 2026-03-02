@@ -7,7 +7,7 @@ Includes move ordering: history heuristic and MVV-LVA for captures.
 
 import time
 from evaluation import evaluate_from_perspective
-from moves import generate_legal_moves, is_stalemate, is_checkmate
+from moves import generate_legal_moves, is_stalemate
 from board import coord_to_sq
 
 # Feature flags for optimization testing
@@ -181,11 +181,11 @@ def negamax(board, depth, alpha, beta, _color=1, tt_move=None, ply=0):
 
     moves = generate_legal_moves(board)
     if not moves:
-        # Checkmate or stalemate
+        # No legal moves: stalemate is draw, otherwise treat as checkmate.
+        # Include ply so faster mates are preferred.
         if is_stalemate(board):
             return 0, None
-        if is_checkmate(board):
-            return -100000, None
+        return -100000 + ply, None
 
     # Move ordering: TT move first, then killer moves, then history heuristic
     ordered_moves = []

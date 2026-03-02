@@ -2,6 +2,7 @@
 Position evaluation for chess AI.
 Positive scores favor white, negative scores favor black.
 For now, we use Simplified Evaluation Function by Tomasz Michniewski.
+Endgame detection.
 """
 
 # Piece values in centipawns
@@ -102,6 +103,91 @@ PIECE_SQUARE_TABLES = {
     'k': KING_MIDDLE_TABLE
 }
 
+MAX_NON_PAWN_MATERIAL = 6400  # Both sides combined (Q+2R+2B+2N per side)
+
+
+def _material_without_kings(board):
+    white = 0
+    black = 0
+    for r in range(8):
+        for c in range(8):
+            piece = board.grid[r][c]
+            if piece == '.':
+                continue
+            p = piece.lower()
+            if p == 'k':
+                continue
+            if piece.isupper():
+                white += PIECE_VALUES[p]
+            else:
+                black += PIECE_VALUES[p]
+    return white, black
+
+
+def _non_pawn_material(board):
+    total = 0
+    for r in range(8):
+        for c in range(8):
+            piece = board.grid[r][c]
+            if piece == '.':
+                continue
+            p = piece.lower()
+            if p in {'n', 'b', 'r', 'q'}:
+                total += PIECE_VALUES[p]
+    return total
+
+
+def _game_phase(board) -> float:
+    """Return middlegame weight in range [0, 1]."""
+    npm = _non_pawn_material(board)
+    return min(1.0, npm / MAX_NON_PAWN_MATERIAL)
+
+
+def _king_positions(board):
+    white_king = None
+    black_king = None
+    for r in range(8):
+        for c in range(8):
+            piece = board.grid[r][c]
+            if piece == 'K':
+                white_king = (r, c)
+            elif piece == 'k':
+                black_king = (r, c)
+    return white_king, black_king
+
+
+def _mop_up_bonus(board) -> int:
+    """Generic endgame conversion bonus for the materially stronger side."""
+    white_mat, black_mat = _material_without_kings(board)
+    diff = white_mat - black_mat
+
+    # Only apply when one side has clear edge in low-material positions.
+    if abs(diff) < 500:
+        return 0
+
+    phase = _game_phase(board)
+    if phase > 0.45:
+        return 0
+
+    white_king, black_king = _king_positions(board)
+    if not white_king or not black_king:
+        return 0
+
+    if diff > 0:
+        strong_king, weak_king, sign = white_king, black_king, 1
+    else:
+        strong_king, weak_king, sign = black_king, white_king, -1
+
+    wr, wc = weak_king
+    edge_distance = min(wr, 7 - wr, wc, 7 - wc)  # 0 on edge, 3 near center
+    push_bonus = (3 - edge_distance) * 18
+
+    sr, sc = strong_king
+    king_distance = abs(sr - wr) + abs(sc - wc)
+    approach_bonus = max(0, 14 - king_distance) * 2
+
+    return sign * (push_bonus + approach_bonus)
+
 
 def evaluate(board):
     """
@@ -110,6 +196,8 @@ def evaluate(board):
     Positive = white advantage, negative = black advantage.
     """
     score = 0
+    mg_weight = _game_phase(board)
+    eg_weight = 1.0 - mg_weight
 
     for r in range(8):
         for c in range(8):
@@ -121,7 +209,17 @@ def evaluate(board):
             piece_value = PIECE_VALUES.get(piece_type, 0)
 
             # Get piece-square table bonus
-            if piece_type in PIECE_SQUARE_TABLES:
+            if piece_type == 'k':
+                if piece.islower():  # Black piece
+                    index = (7 - r) * 8 + c
+                    mg_bonus = -KING_MIDDLE_TABLE[index]
+                    eg_bonus = -KING_END_TABLE[index]
+                else:  # White piece
+                    index = r * 8 + c
+                    mg_bonus = KING_MIDDLE_TABLE[index]
+                    eg_bonus = KING_END_TABLE[index]
+                bonus = int(round(mg_weight * mg_bonus + eg_weight * eg_bonus))
+            elif piece_type in PIECE_SQUARE_TABLES:
                 table = PIECE_SQUARE_TABLES[piece_type]
                 # For black pieces, flip the table vertically
                 if piece.islower():  # Black piece
@@ -130,9 +228,8 @@ def evaluate(board):
                 else:  # White piece
                     index = r * 8 + c
                     bonus = table[index]
-            else: # pragma : no cover
-                bonus = 0 # Redundant, should not happen. But just in case.
-
+            else:  # pragma : no cover
+                bonus = 0
 
             # Add material + positional value
             if piece.isupper():  # White
@@ -140,6 +237,7 @@ def evaluate(board):
             else:  # Black
                 score -= piece_value + bonus
 
+    score += _mop_up_bonus(board)
     return score
 
 
