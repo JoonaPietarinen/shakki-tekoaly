@@ -21,8 +21,6 @@ Shakin pelilogiikka on toteutettu `board.py` sekä `moves.py` tiedostoihin. `mov
 
 ## Teoreettinen analyysi
 
-Uusimmat mittaukset on suoritettu viikolla 5 ennen Null-Window Search optimointia. NWS mittaukset löytyvät `docs\Feature_Toggle_Löydöt.md` tiedostosta, josta löytyy myös analyysi eri optimointien vaikutuksesta.
-
 ### Brute Force Negamax
 - **Kaava:** O(b^d)
 - b = 35 (branching factor shakissa)
