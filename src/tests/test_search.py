@@ -4,8 +4,9 @@ Test suite for chess AI search algorithms.
 
 import pytest
 import os
-from board import Board
+import search
 from search import find_best_move, negamax, is_capture, quiescence, clear_transposition_table, mvv_lva_score, history_table
+from board import Board
 from moves import generate_legal_moves
 
 
@@ -413,9 +414,7 @@ def test_null_window_with_all_optimizations():
     # Both should complete
     assert move is not None, "Should find move with NWS"
     assert move2 is not None, "Should find move without NWS"
-
-
-
+    
 def test_ai_checkmate_detection():
     """Test that AI recognizes checkmate positions"""
     b = Board("rk6/8/8/8/8/8/8/Kqr5 w KQkq - 0 1")
@@ -450,3 +449,45 @@ def test_ai_time_limit_prediction(): # pragma: no cover
 
     elapsed = end_time - start_time
     assert elapsed < max_time, f"AI should return move before {max_time:.2f} seconds, but took {elapsed:.2f} seconds. Adjust max_time"
+
+def test_negamax_stalemate_returns_zero_score():
+    """Stalemate should evaluate as draw score 0 in negamax terminal node."""
+    clear_transposition_table()
+    b = Board("7k/5Q2/6K1/8/8/8/8/8 b - - 0 1")
+    score, move = negamax(b, depth=2, alpha=float('-inf'), beta=float('inf'))
+    assert move is None
+    assert score == 0
+
+
+def test_negamax_checkmate_returns_large_negative_score():
+    """Checkmate should evaluate as a large negative score in negamax terminal node."""
+    clear_transposition_table()
+    b = Board("rk6/8/8/8/8/8/8/Kqr5 w - - 0 1")
+    score, move = negamax(b, depth=2, alpha=float('-inf'), beta=float('inf'))
+    assert move is None
+    assert score <= -99990
+
+
+def test_null_window_fail_low_keeps_previous_best_move(monkeypatch):
+    """Fail-low null-window result should not overwrite previous best move."""
+    clear_transposition_table()
+
+    original_negamax = search.negamax
+
+    def fake_negamax(board, depth, alpha, beta, _color=1, tt_move=None, ply=0):
+        # Depth 1 full-search returns an initial best move and score.
+        if depth == 1 and alpha == float('-inf') and beta == float('inf'):
+            return 10, "a2a3"
+        # Depth >=2 null-window call always fail-low with an unrelated move.
+        if depth >= 2 and beta == alpha + 1:
+            return alpha, "h2h3"
+        # Should not be reached in this test path, but keep safe fallback.
+        return original_negamax(board, depth, alpha, beta, _color=_color, tt_move=tt_move, ply=ply)
+
+    monkeypatch.setattr(search, "negamax", fake_negamax)
+
+    b = Board()
+    move = search.find_best_move(b, depth=3, time_limit=None)
+
+    # On fail-low, find_best_move should retain previous completed depth move.
+    assert move == "a2a3"
