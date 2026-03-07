@@ -3,6 +3,8 @@ Työssä ei ole käytetty laajoja kielimalleja
 ## Ohjelman rakenne
 Kyseessä on shakkitekoäly, jota vastaan voi pelata [AI-platform alustalla](https://github.com/game-ai-platform-team/tira-ai-local?tab=readme-ov-file). Tekoäly käyttää negamax-hakua alpha-beta-karsinnan ja transpositiotaulun kanssa. 
 
+Empiiristen testausten tulosten graafinen esitys ei ole käytännöllistä, joten tulokset esitetään taulukko muodossa.
+
 **Implementoidut optimoinnit:**
 - Negamax + Alpha-Beta karsinta
 - Iteratiivinen syveneminen
