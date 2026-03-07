@@ -312,12 +312,8 @@ def find_best_move(board, depth, time_limit):
             if move:
                 best_move = move
                 best_score = score
-    print("---demo print---")
-    print(f"score: {best_score}")
-    print_search_stats()
-    print(f"Time spent: {elapsed}")
-    print("---demo print---")
-    return best_move #,best_score   # Can return score if needed for profiling
+    print(f"score: {best_score}") # Force printing score for profiling and playtesting purposes
+    return best_move
 
 def print_search_stats(): # pragma: no cover
     print(f"Nodes searched: {search_stats['nodes_searched']}")
