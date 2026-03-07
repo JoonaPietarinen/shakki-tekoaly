@@ -151,7 +151,7 @@ pytest src/tests/ --cov=src --cov-report=html
 
 ### Profilointitulokset
 
-Käytetty: src/profile.py
+Käytetty: src/profiling.py
 
 ```bash
 python src/profiling.py
