@@ -47,3 +47,5 @@ Tekoälyä vastaan voi pelata [TIRA AI-platform alustalla](https://github.com/ga
 [Viikko 5](docs/viikkoraportti5.md)
 
 [Viikko 6](docs/viikkoraportti6.md)
+
+[Viikko 7](docs/viikkoraportti7.md)
