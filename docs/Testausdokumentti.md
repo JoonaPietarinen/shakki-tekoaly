@@ -9,10 +9,11 @@ CI-pipeline ajaa pytestit `src/tests` kansiosta.
 - Siirtojen luonti ja tarkistus (src/tests/test_moves.py)
 - AI haku algoritmi (src/tests/test_search.py)
 - Transpositiotaulut (src/tests/test_transposition.py)
+- Evaluointifunktio (materiaali + piece-square tables)
 
-**Testien lukumäärä:** 56 testiä yhteensä  
+**Testien lukumäärä:** 64 testiä yhteensä  
 
-**Testikattavuus:** ~99%
+**Testikattavuus:** ~98%
 
 ---
 
@@ -89,9 +90,22 @@ CI-pipeline ajaa pytestit `src/tests` kansiosta.
 | test_null_window_search_enabled | ENABLE_NULL_WINDOW: True/False, depth=2 | Haun pitäisi onnistua NWS:stä riippumatta | Pass |
 | test_window_search_narrower_window | ENABLE_NULL_WINDOW: True, depth=3, all flags enabled | Löytää hyvän avaus siirron | Pass |
 | test_null_window_with_all_optimizations | ENABLE_NULL_WINDOW: True/False, depth=4, all optimizations | Haun pitäisi onnistua NWS+kaikki optimpoinnit yhdistelmällä | Pass |
+| test_negamax_stalemate_returns_zero_score | Pattiasema | Negamax palauttaa score 0 | Pass |
+| test_negamax_checkmate_returns_large_negative_score | Mattiasema | Negamax palauttaa suuren negatiivisen arvon | Pass |
+| test_null_window_fail_low_keeps_previous_best_move | Null-window fail-low regressiotesti | Säilyttää aiemman parhaan siirron | Pass |
 | test_ai_checkmate_detection | "rk6/8/8/8/8/8/8/Kqr5 w KQkq - 0 1" | Palauttaa None (matissa) | Pass |
 | test_ai_time_limit | depth=10, time_limit=0.1s | Palauttaa siirron ajassa | Pass |
 | test_ai_time_limit_prediction | depth=10, time_limit=10s | Palauttaa siirron 10s sisällä | Pass (skipped in CI) |
+
+### Evaluointifunktio (test_evaluation.py)
+
+| Testi | Syöte | Odotus | Tulos |
+|-------|-------|--------|-------|
+| test_game_phase_start_position_is_middlegame_weight_one | Alkuasema | _game_phase == 1.0 | Pass |
+| test_game_phase_kings_only_is_zero | Vain kuninkaat | _game_phase == 0.0 | Pass |
+| test_mop_up_bonus_applies_with_lone_king_defender | K+R vs K | _mop_up_bonus > 0 | Pass |
+| test_mop_up_bonus_not_applied_if_defender_has_pawn | K+R vs K+p | _mop_up_bonus == 0 | Pass |
+| test_evaluate_is_numeric_in_simple_endgame | Yksinkertainen loppupeli | evaluate palauttaa int | Pass |
 
 ---
 
@@ -117,6 +131,7 @@ pytest src/tests/test_board.py -v
 pytest src/tests/test_moves.py -v
 pytest src/tests/test_search.py -v
 pytest src/tests/test_transposition.py -v
+pytest src/tests/test_evaluation.py -v
 ```
 
 ### Yksittäinen testi
@@ -267,7 +282,7 @@ Virheellisten siirtojen tunnistus
 
 ## Johtopäätökset
 
-- **56 yksikkötestiä** kattaa ydin ominaisuudet ja optimoinnit
+- **64 yksikkötestiä** kattaa ydin ominaisuudet ja optimoinnit
 - **Kaikki testit menevät läpi**
 - **Profilointi osoittaa** algoritmin tehokkuuden ja optimointien vaikutukset
 - **Deterministiset testit** toistettavissa milloin tahansa
