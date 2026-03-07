@@ -133,12 +133,20 @@ Voimme myös huomata, että vaikka paras siirto on b1c3 kaikilla syvyyksillä, p
 - Kaiken kaikkiaan, optimointiyhdistelmä (QS + Killer + History + NWS) mahdollistaa depth 7 haun 8 sekunnissa.
 # Lähteeet
 
-https://en.wikipedia.org/wiki/Minimax
-https://en.wikipedia.org/wiki/Negamax
-https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning
-https://en.wikipedia.org/wiki/Transposition_table
-https://www.chessprogramming.org/Simplified_Evaluation_Function
-https://www.chessprogramming.org/Killer_Move
-https://www.chessprogramming.org/Quiescence_Search
-https://www.chessprogramming.org/History_Heuristic
-https://www.chessprogramming.org/MVV-LVA
+[Minimax -wikipedia](https://en.wikipedia.org/wiki/Minimax) 
+
+[Negamax -wikipedia](https://en.wikipedia.org/wiki/Negamax) 
+
+[Alpha-beta pruning -wikipedia](https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning)
+
+[Transposition table -wikipedia](https://en.wikipedia.org/wiki/Transposition_table)
+
+[Simplified Evaluation Function -chessprogramming](https://www.chessprogramming.org/Simplified_Evaluation_Function)
+
+[Killer Move -chessprogramming](https://www.chessprogramming.org/Killer_Move)
+
+[Quiescence Search -chessprogramming](https://www.chessprogramming.org/Quiescence_Search)
+
+[History Heuristic -chessprogramming](https://www.chessprogramming.org/History_Heuristic)
+
+[MVV-LVA -chessprogramming](https://www.chessprogramming.org/MVV-LVA)
