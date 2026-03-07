@@ -179,8 +179,6 @@ def _has_basic_mating_material(counts):
 
 def _mop_up_bonus(board) -> int:
     """Endgame conversion bonus when one side has only a king left."""
-    phase = _game_phase(board)
-
     white_counts, black_counts = _side_piece_counts(board)
 
     # Apply only to basic endgames where defender has lone king.
