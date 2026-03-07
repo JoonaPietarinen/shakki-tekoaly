@@ -156,27 +156,49 @@ def _king_positions(board):
     return white_king, black_king
 
 
+def _side_piece_counts(board):
+    white = {'p': 0, 'n': 0, 'b': 0, 'r': 0, 'q': 0, 'k': 0}
+    black = {'p': 0, 'n': 0, 'b': 0, 'r': 0, 'q': 0, 'k': 0}
+    for r in range(8):
+        for c in range(8):
+            piece = board.grid[r][c]
+            if piece == '.':
+                continue
+            p = piece.lower()
+            if piece.isupper():
+                white[p] += 1
+            else:
+                black[p] += 1
+    return white, black
+
+
+def _has_basic_mating_material(counts):
+    # Simple practical set for forced mate against lone king.
+    return counts['q'] >= 1 or counts['r'] >= 1 or counts['b'] >= 2 or (counts['b'] >= 1 and counts['n'] >= 1)
+
+
 def _mop_up_bonus(board) -> int:
-    """Generic endgame conversion bonus for the materially stronger side."""
-    white_mat, black_mat = _material_without_kings(board)
-    diff = white_mat - black_mat
-
-    # Only apply when one side has clear edge in low-material positions.
-    if abs(diff) < 500:
-        return 0
-
+    """Endgame conversion bonus when one side has only a king left."""
     phase = _game_phase(board)
-    if phase > 0.45:
+
+    white_counts, black_counts = _side_piece_counts(board)
+
+    # Apply only to basic endgames where defender has lone king.
+    white_only_king = white_counts['k'] == 1 and sum(white_counts[p] for p in ('p', 'n', 'b', 'r', 'q')) == 0
+    black_only_king = black_counts['k'] == 1 and sum(black_counts[p] for p in ('p', 'n', 'b', 'r', 'q')) == 0
+
+    if black_only_king and _has_basic_mating_material(white_counts):
+        sign = 1
+    elif white_only_king and _has_basic_mating_material(black_counts):
+        sign = -1
+    else:
         return 0
 
     white_king, black_king = _king_positions(board)
     if not white_king or not black_king:
         return 0
 
-    if diff > 0:
-        strong_king, weak_king, sign = white_king, black_king, 1
-    else:
-        strong_king, weak_king, sign = black_king, white_king, -1
+    strong_king, weak_king = (white_king, black_king) if sign == 1 else (black_king, white_king)
 
     wr, wc = weak_king
     edge_distance = min(wr, 7 - wr, wc, 7 - wc)  # 0 on edge, 3 near center
@@ -196,8 +218,8 @@ def evaluate(board):
     Positive = white advantage, negative = black advantage.
     """
     score = 0
-    mg_weight = _game_phase(board)
-    eg_weight = 1.0 - mg_weight
+    mg_weight = _game_phase(board) # 1.0 in opening, 0.0 in endgame
+    eg_weight = 1.0 - mg_weight # 0.0 in opening, 1.0 in endgame
 
     for r in range(8):
         for c in range(8):
@@ -218,7 +240,7 @@ def evaluate(board):
                     index = r * 8 + c
                     mg_bonus = KING_MIDDLE_TABLE[index]
                     eg_bonus = KING_END_TABLE[index]
-                bonus = int(round(mg_weight * mg_bonus + eg_weight * eg_bonus))
+                bonus = int(round(mg_weight * mg_bonus + eg_weight * eg_bonus)) # Blend middle and endgame tables based on game phase for better endgame evaluation
             elif piece_type in PIECE_SQUARE_TABLES:
                 table = PIECE_SQUARE_TABLES[piece_type]
                 # For black pieces, flip the table vertically
