@@ -14,10 +14,19 @@ Tekoälyä vastaan voi pelata [TIRA AI-platform alustalla](https://github.com/ga
 
 
 2. **Käynnistä AI-platform:**  
- Seuraa AI-platformin [ohjeita](https://algolabra-hy.github.io/aiplatform-fi#:~:text=Minimaaliset%20ohjeet%20k%C3%A4ytt%C3%B6%C3%B6nottoon)
+ Seuraa AI-platformin [ohjeita](https://algolabra-hy.github.io/aiplatform-fi#:~:text=Minimaaliset%20ohjeet%20k%C3%A4ytt%C3%B6%C3%B6nottoon):
+     1. Lataa AI-platform uusin release.
+     2. Asenna poetry
+     3. Pura ladattu AI-platform ja navigoi sen juurikansioon
+     4. Käynnistä alusta `./tira-ai-local` komennolla, jos tämä kaatuu, kokeile `./tira-ai-local --no-sandbox`
+     5. Valitse peliksi shakki
+     6. Raahaa kloonattu `shakki-tekoaly` juuri kansio `submit folder:` osioon
+     7. Jos haluat käyttää omaa FEN-merkkijonoa, kirjoita se `Set FEN` osioon
+     8. Paina `SUBMIT` ja aloita pelaaminen
 
 
-3. **Pelaa:**  
+
+4. **Pelaa:**  
 - Valitse peliksi shakki
 - Raahaa tämän projektin juurikansio AI-platformin "Submit your AI" -osioon
 - Tee siirtoja shakkilaudalla
