@@ -33,6 +33,8 @@ Shakin pelilogiikka on toteutettu `board.py` sekä `moves.py` tiedostoihin. `mov
 - Depth 3: 35³ = 42,875 solmua
 - Depth 4: 35⁴ = 1,500,625 solmua
 - Depth 5: 35⁵ = 52,521,875 solmua
+  
+Keskimääräinen laillisten siirtojen määrä (branching factor) shakissa on 35.
 
 ### Alpha-Beta Haulla (teoria)
 - **Kaava:** O(b^(d/2)) parhaassa tapauksessa
