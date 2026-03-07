@@ -134,9 +134,11 @@ Voimme myös huomata, että vaikka paras siirto on b1c3 kaikilla syvyyksillä, p
 # Lähteeet
 
 https://en.wikipedia.org/wiki/Minimax
+https://en.wikipedia.org/wiki/Negamax
 https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning
 https://en.wikipedia.org/wiki/Transposition_table
 https://www.chessprogramming.org/Simplified_Evaluation_Function
 https://www.chessprogramming.org/Killer_Move
 https://www.chessprogramming.org/Quiescence_Search
 https://www.chessprogramming.org/History_Heuristic
+https://www.chessprogramming.org/MVV-LVA
