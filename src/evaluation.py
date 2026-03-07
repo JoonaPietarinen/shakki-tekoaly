@@ -105,25 +105,6 @@ PIECE_SQUARE_TABLES = {
 
 MAX_NON_PAWN_MATERIAL = 6400  # Both sides combined (Q+2R+2B+2N per side)
 
-
-def _material_without_kings(board):
-    white = 0
-    black = 0
-    for r in range(8):
-        for c in range(8):
-            piece = board.grid[r][c]
-            if piece == '.':
-                continue
-            p = piece.lower()
-            if p == 'k':
-                continue
-            if piece.isupper():
-                white += PIECE_VALUES[p]
-            else:
-                black += PIECE_VALUES[p]
-    return white, black
-
-
 def _non_pawn_material(board):
     total = 0
     for r in range(8):
