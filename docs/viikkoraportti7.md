@@ -11,4 +11,4 @@ Hyvin.
 
 Demotilaisuuden pitäminen ja työn viimeistely
 
-Aikaa tällä viikolla käytin n. 8 h
+Aikaa tällä viikolla käytin n. 8 h + useampi tunti vertaisarviointiin

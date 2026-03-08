@@ -8,4 +8,4 @@ Pidin loppudemon ja viimeistelin työtä. Lisäsin loppupelin tunnistamisen ja k
 Ohjelma on valmis ja dokumentaatio viimeisteltyä.
 
 
-Aikaa tällä viikolla käytin n. 10 h
+Aikaa tällä viikolla käytin n. 14 h

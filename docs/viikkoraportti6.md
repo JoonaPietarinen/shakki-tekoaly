@@ -16,4 +16,4 @@ Lisää Null-Window searchistä.
 
 Koen, että nykyisen aikakatkaisun kehittäminen ei välttämättä ole enää relevanttia. Seuraavaksi aion puhdistaa koodia ja kommentoida sitä auki mahdollisimman selkeästi, mutta ei kuitenkaan liiallisesti.
 
-Aikaa tällä viikolla käytin n. 9 h
+Aikaa tällä viikolla käytin n. 14 h

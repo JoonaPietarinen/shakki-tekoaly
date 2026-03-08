@@ -17,4 +17,4 @@ Opin quiescence search algoritmin ja sen toteutuksen.
 Seuraavaksi aion toteuttaa negamaxin sisälle aikakatkaisun.
 
 
-Aikaa tällä viikolla käytin n. 10 h
+Aikaa tällä viikolla käytin n. 10 h + useampi tunti vertaisarviointiin

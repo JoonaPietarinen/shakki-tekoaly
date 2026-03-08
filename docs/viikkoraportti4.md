@@ -19,4 +19,4 @@ Opin lisää optimoinneista, kuten killer moves -optimoinnista, sekä siitä, mi
 Seuraavaksi aion jatkaa iteratiivisen syvenemisen kehitystä. Tämän lisäksi perehdyn siihen, miten saisin järkevästi laskettua optimaalisen ajan per vuoro.
 
 
-Aikaa tällä viikolla käytin n. 8h
+Aikaa tällä viikolla käytin n. 10h

@@ -8,4 +8,4 @@ Opin miten kurssin tekoälyalusta toimii shakkia varten.
 Suurin pohdinta liittyi aluksi siihen, mikä taso algoritmeissa riittää kurssille ja missä vaiheessa aiheesta tulee liian laaja
 
 **Työmäärä**  
-Käytin kokonaisuudessa työhön n. 7h.
+Käytin kokonaisuudessa työhön n. 9h.

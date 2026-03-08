@@ -17,4 +17,4 @@ Transpositiotauluista sekä siirtojen järjestämisen todellisesta hyödystä.
 Seuraavaksi toteutan toistuvaan asemaan perustuva tasapelin. Mahdollisesti aloitan iteratiivisen syvenemisen haun kehityksen.
 
 
-Aikaa tällä viikolla käytin n. 7h
+Aikaa tällä viikolla käytin n. 11h
