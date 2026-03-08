@@ -83,6 +83,7 @@ Iteratiivinen syveneminen (kaikki optimoinnit):
 **Huomio:** Time Limit voi ylittyä, jos uudella iteraatiolla aikaa on vielä yli 40% jäljellä. Toisaalta se voi myös alittua, jos aikaa on alle 40% jäljellä, jolloin iteraatio keskeytetään.
 Voimme myös huomata, että vaikka paras siirto on b1c3 kaikilla syvyyksillä, pistearvio ei kuitenkaan ole identtinen. Syvemmillä hauilla siirto arvioidaan huonommaksi, mutta silti parhaaksi.
 
+![Graafinen esitys](screenshots/is_graph.png)
 
 ## Miksi mitattu on paljon pienempi kuin teoria?
 
