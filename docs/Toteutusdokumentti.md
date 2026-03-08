@@ -70,6 +70,10 @@ Feature toggle (Depth 5):
 
 **Huomio:** Speedup viittaa solmujen vähennykseen, ei suoraan aikaan (baseline nodes/scenario nodes = 237203/x).
 
+![Graafinen esitys](screenshots/ft_graph.png)
+
+Kaavion lukua helpottaakseen aika käyttää omaa akseliaan, joka on merkattu oikealle nimellä "aika".
+
 Iteratiivinen syveneminen (kaikki optimoinnit):
 
 | Time Limit | Actual Time | Reached Depth | Negamax Nodes | QS Nodes | TT Hits | Score | Best Move |
