@@ -85,6 +85,8 @@ Voimme myös huomata, että vaikka paras siirto on b1c3 kaikilla syvyyksillä, p
 
 ![Graafinen esitys](screenshots/is_graph.png)
 
+Kaavion lukua helpottaakseen aika käyttää omaa akseliaan, joka on merkattu oikealle nimellä "aika".
+
 ## Miksi mitattu on paljon pienempi kuin teoria?
 
 1. **Move Ordering** - Killer moves + TT-siirto tutkitaan ensin, parantaa hakua huomattavasti
