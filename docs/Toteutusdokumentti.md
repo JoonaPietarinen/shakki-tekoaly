@@ -69,7 +69,7 @@ Feature toggle (Depth 5):
 
 **Huomio:** Speedup viittaa solmujen vähennykseen, ei suoraan aikaan (baseline nodes/scenario nodes = 237203/x).
 
-![Graafinen esitys](screenshots/ft_graph.png)
+![Graafinen esitys FT](screenshots/ft_graph.png)
 
 Kaavion lukua helpottaakseen aika käyttää omaa akseliaan, joka on merkattu oikealle nimellä "aika".
 
@@ -86,7 +86,7 @@ Iteratiivinen syveneminen (kaikki optimoinnit):
 **Huomio:** Time Limit voi ylittyä, jos uudella iteraatiolla aikaa on vielä yli 40% jäljellä. Toisaalta se voi myös alittua, jos aikaa on alle 40% jäljellä, jolloin iteraatio keskeytetään.
 Voimme myös huomata, että vaikka paras siirto on b1c3 kaikilla syvyyksillä, pistearvio ei kuitenkaan ole identtinen. Syvemmillä hauilla siirto arvioidaan huonommaksi, mutta silti parhaaksi.
 
-![Graafinen esitys](screenshots/is_graph.png)
+![Graafinen esitys IS](screenshots/is_graph.png)
 
 Kaavion lukua helpottaakseen aika käyttää omaa akseliaan, joka on merkattu oikealle nimellä "aika".
 
