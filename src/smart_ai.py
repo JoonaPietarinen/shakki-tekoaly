@@ -43,7 +43,7 @@ def main():
     """Main loop: receive commands and play moves."""
     board = Board()
     search_depth = 100
-    time_limit = 1
+    time_limit = 10
 
     while True:
         opponent_move = input()
