@@ -2,12 +2,14 @@
 Test suite for chess AI search algorithms.
 """
 
+from encodings import shift_jisx0213
+from re import M
 import pytest
 import os
 import search
 from search import find_best_move, negamax, is_capture, quiescence, clear_transposition_table, mvv_lva_score, history_table
 from board import Board
-from moves import generate_legal_moves
+from moves import generate_legal_moves, is_checkmate
 
 
 def test_negamax_finds_move():
@@ -491,3 +493,108 @@ def test_null_window_fail_low_keeps_previous_best_move(monkeypatch):
 
     # On fail-low, find_best_move should retain previous completed depth move.
     assert move == "a2a3"
+
+def test_iterative_deepening_depth_12_mate_in_6():
+    """
+    Test that using iterative deepening negamax finds forced mate in 6 full moves with depth 12 (12 half moves)
+    and maintains on that course, i.e. doesn't override the checkmate with worse moves when depth is deeper than the check
+    """
+    clear_transposition_table()
+    b = Board("K1k5/P1Pp4/1p1P4/8/p7/P2P4/8/8 w - - 0 1")
+    move = find_best_move(b, depth=12, time_limit=None)
+    assert move == "d3d4", f"Expected d3d4 as mate in 6, but got {move}"
+    b.make_move(move)
+    b.make_move("b6b5") # Opponent moves
+    move = find_best_move(b, depth=12, time_limit=None)
+    assert move == "d4d5", f"Expected d4d5 as mate in 5, but got {move}"
+    b.make_move(move)
+    b.make_move("b5b4") # Opponent moves
+    move = find_best_move(b, depth=12, time_limit=None)
+    assert move == "a3b4", f"Expected a3b4 as mate in 4, but got {move}"
+    b.make_move(move)
+    b.make_move("a4a3") # Opponent moves
+    move = find_best_move(b, depth=12, time_limit=None)
+    assert move == "b4b5", f"Expected b4b5 as mate in 3, but got {move}"
+    b.make_move(move)
+    b.make_move("a3a2") # Opponent moves
+    move = find_best_move(b, depth=12, time_limit=None)
+    assert move == "b5b6", f"Expected b5b6 as mate in 2, but got {move}"
+    b.make_move(move)
+    b.make_move("a2a1q") # Opponent promotes to queen
+    move = find_best_move(b, depth=12, time_limit=None)
+    assert move == "b6b7", f"Expected b6b7 as mate in 1, but got {move}"
+    b.make_move(move)
+    assert is_checkmate(b), "Should be checkmate"
+
+def test_negamax_depth_12_mate_in_6():
+    """
+    Test that negamax finds forced mate in 6 full moves with depth 12 (12 half moves) 
+    and maintains on that course, i.e. doesn't override the checkmate with worse moves when depth is deeper than the check
+    """
+    clear_transposition_table()
+    b = Board("K1k5/P1Pp4/1p1P4/8/p7/P2P4/8/8 w - - 0 1")
+    score, move = negamax(b, 12, float('-inf'), float('inf'), ply=0)
+    assert score >= 99988, f"Expected winning move with score >= 99988, but got {score}"
+    b.make_move(move)
+    b.make_move("b6b5") # Opponent moves
+    score, move = negamax(b, 12, float('-inf'), float('inf'), ply=0)
+    assert score >= 99988, f"Expected winning move with score >= 99988, but got {score}"
+    b.make_move(move)
+    b.make_move("b5b4") # Opponent moves
+    score, move = negamax(b, 12, float('-inf'), float('inf'), ply=0)
+    assert score >= 99988, f"Expected winning move with score >= 99988, but got {score}"
+    b.make_move(move)
+    b.make_move("a4a3") # Opponent moves
+    score, move = negamax(b, 12, float('-inf'), float('inf'), ply=0)
+    assert score >= 99990, f"Expected winning move with score >= 99990, but got {score}"
+    b.make_move(move)
+    b.make_move("a3a2") # Opponent moves
+    score, move = negamax(b, 12, float('-inf'), float('inf'), ply=0)
+    assert score >= 99990, f"Expected winning move with score >= 99990, but got {score}"
+    b.make_move(move)
+    b.make_move("a2a1q") # Opponent promotes to queen
+    score, move = negamax(b, 12, float('-inf'), float('inf'), ply=0)
+    assert score >= 99990, f"Expected winning move with score >= 99990, but got {score}"
+    b.make_move(move)
+    assert is_checkmate(b), "Should be checkmate"
+
+def test_iterative_deepening_depth_6_mate_in_3():
+    """Test that using iterative deepening negamax finds forced mate in 3 full moves with depth 6 (6 half moves) 
+    and maintains on that course, i.e. doesn't override the checkmate with worse moves when depth is deeper than the check
+    """
+    clear_transposition_table()
+    b = Board("r5rk/5p1p/5R2/4B3/8/8/7P/7K w KQkq - 0 1")
+    b.make_move(find_best_move(b, depth=6, time_limit=None))
+    b.make_move("a8a7") # Opponent moves
+    b.make_move(find_best_move(b, depth=6, time_limit=None))
+    b.make_move("a7f7") # Opponent moves
+    b.make_move(find_best_move(b, depth=6, time_limit=None))
+    assert is_checkmate(b), "Should be checkmate"
+
+def test_negamax_depth_6_mate_in_3():
+    """Test that negamax finds forced mate in 3 full moves with depth 6 (6 half moves) 
+    and maintains on that course, i.e. doesn't override the checkmate with worse moves when depth is deeper than the check
+    """
+    clear_transposition_table()
+    b = Board("r5rk/5p1p/5R2/4B3/8/8/7P/7K w KQkq - 0 1")
+    score, move = negamax(b, 6, float('-inf'), float('inf'), ply=0)
+    b.make_move(move)
+    assert score >= 99990, f"Expected winning move with score >= 99990, but got {score}"
+    b.make_move("a8a7") # Opponent moves
+    score, move = negamax(b, 6, float('-inf'), float('inf'), ply=0)
+    b.make_move(move)
+    assert score >= 99990, f"Expected winning move with score >= 99990, but got {score}"
+    b.make_move("a7f7") # Opponent moves
+    score, move = negamax(b, 6, float('-inf'), float('inf'), ply=0)
+    b.make_move(move)
+    assert score >= 99990, f"Expected winning move with score >= 99990, but got {score}"
+    assert is_checkmate(b), "Should be checkmate"
+
+def test_negamax_trade_pawn_for_queen():
+    """Test that negamax correctly evaluates a position where it can trade a pawn for a queen and finds the move to do so"""
+    clear_transposition_table
+    b = Board("6pk/6pp/6q1/7p/6P1/5Q2/6PP/6PK w KQkq - 0 1")
+    b.make_move(find_best_move(b, depth=4, time_limit=None))
+    b.make_move("g6h5") # Opponent moves
+    move = find_best_move(b, depth=4, time_limit=None)
+    assert move == "f3h5", f"Expected move to capture queen with queen (f3h5), but got {move}"
