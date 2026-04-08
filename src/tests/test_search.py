@@ -559,7 +559,8 @@ def test_negamax_depth_12_mate_in_6():
     assert is_checkmate(b), "Should be checkmate"
 
 def test_iterative_deepening_depth_6_mate_in_3():
-    """Test that using iterative deepening negamax finds forced mate in 3 full moves with depth 6 (6 half moves) 
+    """
+    Test that using iterative deepening negamax finds forced mate in 3 full moves with depth 6 (6 half moves) 
     and maintains on that course, i.e. doesn't override the checkmate with worse moves when depth is deeper than the check
     """
     clear_transposition_table()
@@ -572,7 +573,8 @@ def test_iterative_deepening_depth_6_mate_in_3():
     assert is_checkmate(b), "Should be checkmate"
 
 def test_negamax_depth_6_mate_in_3():
-    """Test that negamax finds forced mate in 3 full moves with depth 6 (6 half moves) 
+    """
+    Test that negamax finds forced mate in 3 full moves with depth 6 (6 half moves) 
     and maintains on that course, i.e. doesn't override the checkmate with worse moves when depth is deeper than the check
     """
     clear_transposition_table()
